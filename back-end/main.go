@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 
-	// Import the generated docs file
-	_ "github.com/RiadMefti/TimeTracker/back-end/docs" // Import your module's docs
+	// Import the generated docs file for Swagger documentation
+	_ "github.com/RiadMefti/TimeTracker/back-end/docs" 
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 )
@@ -19,6 +19,8 @@ func main() {
 
 	// Hello World endpoint
 	app.Get("/hello", getHelloHandler)
+
+	app.Get("/bye", byeHandler)
 
 	// Swagger endpoint
 	app.Get("/swagger/*", swagger.HandlerDefault)
@@ -38,5 +40,16 @@ func main() {
 // @Success 200 {string} string "Success"
 // @Router /hello [get]
 func getHelloHandler(c *fiber.Ctx) error {
-	return c.SendString("Hello, World!")
+	return c.SendString("Hello, World!!")
+}
+
+// @Summary Get a simple goodbye message
+// @Description Returns a "Goodbye, World!" string
+// @Tags Greeting
+// @Accept  json
+// @Produce plain
+// @Success 200 {string} string "Success"
+// @Router /bye [get]
+func byeHandler(c *fiber.Ctx) error {
+	return c.SendString("Goodbye, World!!")
 }

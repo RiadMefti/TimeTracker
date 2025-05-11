@@ -6,6 +6,21 @@ info:
   title: TimeTracker Back-end API
   version: "1.0"
 paths:
+  /bye:
+    get:
+      consumes:
+      - application/json
+      description: Returns a "Goodbye, World!" string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: string
+      summary: Get a simple goodbye message
+      tags:
+      - Greeting
   /hello:
     get:
       consumes:

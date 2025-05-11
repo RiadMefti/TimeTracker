@@ -1,0 +1,20 @@
+FROM golang:1.23-alpine
+
+WORKDIR /app
+
+# Copy go.mod and go.sum 
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Install Air for hot-reloading
+RUN go install github.com/air-verse/air@latest
+
+# Copy the rest of the application
+COPY . .
+
+
+# api port 3000
+EXPOSE 3000
+
+# Use Air to run the application with hot-reloading
+CMD ["air", "-c", ".air.toml"]

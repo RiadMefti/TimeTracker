@@ -1,0 +1,23 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+tmp
+
+# Build output directories
+bin/
+build/
+
+# Go build cache
+/go-build
+
+# Output for executables
+*.out
+
+# Dependency directories (use "vendor/" if vendoring is enabled)
+vendor/
+
+# Go workspace file
+go.work

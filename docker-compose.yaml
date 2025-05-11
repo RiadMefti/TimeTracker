@@ -1,0 +1,63 @@
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Golang back-end
+  back-end:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    container_name: back-end
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./back-end:/app
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=app_db
+      - DB_PORT=5432
+    networks:
+      - app-network
+
+  # React front-end
+  front-end:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile.dev
+    container_name: front-end
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./front-end:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
