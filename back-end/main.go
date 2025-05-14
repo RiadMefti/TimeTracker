@@ -15,6 +15,11 @@ import (
 // @host localhost:3000
 // @BasePath /
 func main() {
+	RunApp()
+}
+
+// RunApp initializes and starts the Fiber application
+func RunApp() {
 	app := fiber.New()
 
 	// Hello World endpoint
