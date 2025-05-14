@@ -1,12 +1,11 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
-
 	// Import the generated docs file for Swagger documentation
-	_ "github.com/RiadMefti/TimeTracker/back-end/docs" 
+	"log"
 
-	swagger "github.com/arsmn/fiber-swagger/v2"
+	"github.com/RiadMefti/TimeTracker/back-end/app"
+	_ "github.com/RiadMefti/TimeTracker/back-end/docs"
 )
 
 // @title TimeTracker Back-end API
@@ -15,46 +14,8 @@ import (
 // @host localhost:3000
 // @BasePath /
 func main() {
-	RunApp()
-}
-
-// RunApp initializes and starts the Fiber application
-func RunApp() {
-	app := fiber.New()
-
-	// Hello World endpoint
-	app.Get("/hello", getHelloHandler)
-
-	app.Get("/bye", byeHandler)
-
-	// Swagger endpoint
-	app.Get("/swagger/*", swagger.HandlerDefault)
-
-	// Start the server
-	err := app.Listen(":3000")
+	err := app.RunApp()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-}
-
-// @Summary Get a simple greeting
-// @Description Returns a "Hello, World!" string
-// @Tags Greeting
-// @Accept  json
-// @Produce plain
-// @Success 200 {string} string "Success"
-// @Router /hello [get]
-func getHelloHandler(c *fiber.Ctx) error {
-	return c.SendString("Hello, World!!")
-}
-
-// @Summary Get a simple goodbye message
-// @Description Returns a "Goodbye, World!" string
-// @Tags Greeting
-// @Accept  json
-// @Produce plain
-// @Success 200 {string} string "Success"
-// @Router /bye [get]
-func byeHandler(c *fiber.Ctx) error {
-	return c.SendString("Goodbye, World!!")
 }

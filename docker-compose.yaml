@@ -29,7 +29,7 @@ services:
     depends_on:
       - postgres
     environment:
-      - DB_HOST=localhost
+      - DB_HOST=postgres
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=app_db

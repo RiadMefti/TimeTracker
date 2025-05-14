@@ -10,7 +10,7 @@ import (
 
 func InitDb() (*sql.DB, error) {
 	// Get database credentials from environment variables
-	dbHost := utils.GetEnv("DB_HOST", "localhost")
+	dbHost := utils.GetEnv("DB_HOST", "postgres")
 	dbUser := utils.GetEnv("DB_USER", "postgres")
 	dbPassword := utils.GetEnv("DB_PASSWORD", "postgres")
 	dbName := utils.GetEnv("DB_NAME", "app_db")
@@ -21,11 +21,12 @@ func InitDb() (*sql.DB, error) {
 
 	db, err := sql.Open("postgres", connexionString)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database connection: %w ", err)
+		return nil, fmt.Errorf("failed to open database connection: %w", err)
 	}
 
-	if db.Ping() != nil {
-		return nil, fmt.Errorf("failed to ping database : %w ", err)
+	err = db.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 	return db, nil
 }

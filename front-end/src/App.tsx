@@ -8,6 +8,7 @@ interface AppProps {
 
 const App: FC<AppProps> = ({ auth }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [responseFromServer, setResponseFromServer] = useState<string>("");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
@@ -43,6 +44,15 @@ const App: FC<AppProps> = ({ auth }) => {
         <div>
           <p>Welcome, {user.displayName}!</p>
           <p>Email: {user.email}</p>
+          <p>{responseFromServer}</p>
+          <button
+            onClick={async () => {
+              const res = await fetch("http://localhost:3000/hello");
+              setResponseFromServer(await res.text());
+            }}
+          >
+            ping server
+          </button>
           <button onClick={disconnect}>Disconnect</button>
         </div>
       ) : (

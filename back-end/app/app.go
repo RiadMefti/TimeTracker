@@ -56,9 +56,13 @@ func RunApp() error {
 
 	//routes
 	routes.SetupUserRoutes(app, userController)
-	
+
 	// Swagger endpoint
 	app.Get("/swagger/*", swagger.HandlerDefault)
+
+	app.Get("/hello", func(c *fiber.Ctx) error {
+		return c.SendString("Goodbye, World!!")
+	})
 	log.Println("Starting server on port 3000")
 	errStart := app.Listen(":3000")
 	if errStart != nil {
