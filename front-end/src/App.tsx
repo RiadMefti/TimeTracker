@@ -1,0 +1,57 @@
+import type { Auth, User } from "firebase/auth";
+import { useState, type FC, useEffect } from "react";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+
+interface AppProps {
+  auth: Auth;
+}
+
+const App: FC<AppProps> = ({ auth }) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+  }, [auth]);
+
+  const signInWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      setUser(user);
+      const token = await user.getIdToken();
+
+      console.log("User signed in:", user);
+      console.log("Token:", token);
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+    }
+  };
+
+  const disconnect = () => {
+    auth.signOut();
+    setUser(null);
+  };
+
+  return (
+    <div>
+      <h1>Time Tracker App</h1>
+      {user ? (
+        <div>
+          <p>Welcome, {user.displayName}!</p>
+          <p>Email: {user.email}</p>
+          <button onClick={disconnect}>Disconnect</button>
+        </div>
+      ) : (
+        <button onClick={signInWithGoogle}>
+          <span>Sign in with Google</span>
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default App;
