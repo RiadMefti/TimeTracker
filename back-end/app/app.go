@@ -1,12 +1,11 @@
 package app
 
 import (
-	"context"
 	"log"
-	"strings"
 
 	"github.com/RiadMefti/TimeTracker/back-end/controllers"
 	"github.com/RiadMefti/TimeTracker/back-end/db"
+	"github.com/RiadMefti/TimeTracker/back-end/middleware"
 	"github.com/RiadMefti/TimeTracker/back-end/repositories"
 	"github.com/RiadMefti/TimeTracker/back-end/routes"
 	"github.com/RiadMefti/TimeTracker/back-end/services"
@@ -26,18 +25,6 @@ func RunApp() error {
 	//init app
 	app := fiber.New()
 
-	//middleware
-
-	app.Use(logger.New())
-	app.Use(recover.New())
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "*",
-		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
-		AllowHeaders:     "Accept,Authorization,Content-Type",
-		AllowCredentials: false,
-		MaxAge:           300,
-	}))
-
 	//Create Db
 
 	db, err := db.InitDb()
@@ -55,6 +42,21 @@ func RunApp() error {
 	if err != nil {
 		return err
 	}
+
+	//middleware
+
+	app.Use(logger.New())
+	app.Use(recover.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "*",
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS,PATCH",
+		AllowHeaders:     "Accept,Authorization,Content-Type",
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
+	app.Use(middleware.AuthorizationMiddleware(firebaseService))
+
 	//controllers
 
 	authController := controllers.NewAuthController(authService)
@@ -66,16 +68,8 @@ func RunApp() error {
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	app.Get("/hello", func(c *fiber.Ctx) error {
-		ctx := context.Background()
-		client, err := firebaseService.Auth(ctx)
-		if err != nil {
-			return err
-		}
-		header := c.GetReqHeaders()
-		authHeader := header["Authorization"][0]
-		authBearer := strings.Split(authHeader, " ")[1]
-		token, err := client.VerifyIDToken(ctx, authBearer)
-		return c.SendString(token.UID)
+
+		return c.SendString("hello")
 	})
 	log.Println("Starting server on port 3000")
 	errStart := app.Listen(":3000")
