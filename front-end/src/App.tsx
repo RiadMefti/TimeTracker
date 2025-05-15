@@ -49,6 +49,7 @@ const App: FC<AppProps> = ({ auth }) => {
             onClick={async () => {
               const res = await fetch("http://localhost:3000/hello");
               setResponseFromServer(await res.text());
+              console.log(user.uid);
             }}
           >
             ping server

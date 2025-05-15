@@ -48,14 +48,14 @@ func RunApp() error {
 	userRepository := repositories.NewUserRepository(db)
 
 	//services
-	userService := services.NewUserService(userRepository)
+	authService := services.NewAuthService(userRepository)
 
 	//controllers
 
-	userController := controllers.NewUserController(userService)
+	authController := controllers.NewAuthController(authService)
 
 	//routes
-	routes.SetupUserRoutes(app, userController)
+	routes.SetupAuthRoutes(app, authController)
 
 	// Swagger endpoint
 	app.Get("/swagger/*", swagger.HandlerDefault)

@@ -1,6 +1,10 @@
 package repositories
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/RiadMefti/TimeTracker/back-end/models"
+)
 
 type UserRepository struct {
 	db *sql.DB
@@ -14,7 +18,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 
 }
 
-func (r *UserRepository) CreateUser(email string) error {
-	_, err := r.db.Exec("INSERT INTO users (email) VALUES ($1)", email)
+func (r *UserRepository) CreateUser(user models.User) error {
+	_, err := r.db.Exec("INSERT INTO users (id, email) VALUES ($1, $2)", user.ID, user.Email)
 	return err
 }
