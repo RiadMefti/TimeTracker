@@ -5,7 +5,7 @@
 *.so
 *.dylib
 tmp
-
+.env
 # Build output directories
 bin/
 build/
