@@ -1,7 +1,9 @@
 package app
 
 import (
+	"context"
 	"log"
+	"strings"
 
 	"github.com/RiadMefti/TimeTracker/back-end/controllers"
 	"github.com/RiadMefti/TimeTracker/back-end/db"
@@ -49,7 +51,10 @@ func RunApp() error {
 
 	//services
 	authService := services.NewAuthService(userRepository)
-
+	firebaseService, err := services.NewFirebaseService()
+	if err != nil {
+		return err
+	}
 	//controllers
 
 	authController := controllers.NewAuthController(authService)
@@ -61,7 +66,16 @@ func RunApp() error {
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	app.Get("/hello", func(c *fiber.Ctx) error {
-		return c.SendString("Goodbye, World!!")
+		ctx := context.Background()
+		client, err := firebaseService.Auth(ctx)
+		if err != nil {
+			return err
+		}
+		header := c.GetReqHeaders()
+		authHeader := header["Authorization"][0]
+		authBearer := strings.Split(authHeader, " ")[1]
+		token, err := client.VerifyIDToken(ctx, authBearer)
+		return c.SendString(token.UID)
 	})
 	log.Println("Starting server on port 3000")
 	errStart := app.Listen(":3000")

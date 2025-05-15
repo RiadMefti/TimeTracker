@@ -47,9 +47,14 @@ const App: FC<AppProps> = ({ auth }) => {
           <p>{responseFromServer}</p>
           <button
             onClick={async () => {
-              const res = await fetch("http://localhost:3000/hello");
+              const res = await fetch("http://localhost:3000/hello", {
+                headers: {
+                  Authorization: "Bearer " + (await user.getIdToken()),
+                },
+              });
               setResponseFromServer(await res.text());
               console.log(user.uid);
+              console.log(await user.getIdToken());
             }}
           >
             ping server

@@ -9,7 +9,7 @@ tmp
 # Build output directories
 bin/
 build/
-
+key.json
 # Go build cache
 /go-build
 
