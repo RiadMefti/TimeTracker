@@ -27,11 +27,19 @@ func AuthorizationMiddleware(firebaseService *firebase.App) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).SendString("Invalid Authorization header format")
 
 		}
-		_, err = client.VerifyIDToken(ctx, parts[1])
+		uidToken, err := client.VerifyIDToken(ctx, parts[1])
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized")
 
 		}
+
+		user, err := client.GetUser(ctx, uidToken.UID)
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).SendString("Can not find the user")
+
+		}
+
+		c.Locals("user", user)
 		return c.Next()
 	}
 }

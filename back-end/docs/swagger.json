@@ -9,45 +9,37 @@
     "host": "localhost:3000",
     "basePath": "/",
     "paths": {
-        "/bye": {
-            "get": {
-                "description": "Returns a \"Goodbye, World!\" string",
-                "consumes": [
-                    "application/json"
-                ],
+        "/auth/login": {
+            "post": {
+                "description": "Create or log a user",
                 "produces": [
                     "text/plain"
                 ],
                 "tags": [
-                    "Greeting"
+                    "auth"
                 ],
-                "summary": "Get a simple goodbye message",
+                "summary": "Create or log a user",
                 "responses": {
                     "200": {
-                        "description": "Success",
+                        "description": "user Exists",
                         "schema": {
                             "type": "string"
                         }
-                    }
-                }
-            }
-        },
-        "/hello": {
-            "get": {
-                "description": "Returns a \"Hello, World!\" string",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "text/plain"
-                ],
-                "tags": [
-                    "Greeting"
-                ],
-                "summary": "Get a simple greeting",
-                "responses": {
-                    "200": {
-                        "description": "Success",
+                    },
+                    "201": {
+                        "description": "user Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "user not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error message",
                         "schema": {
                             "type": "string"
                         }

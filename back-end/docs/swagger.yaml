@@ -6,34 +6,29 @@ info:
   title: TimeTracker Back-end API
   version: "1.0"
 paths:
-  /bye:
-    get:
-      consumes:
-      - application/json
-      description: Returns a "Goodbye, World!" string
+  /auth/login:
+    post:
+      description: Create or log a user
       produces:
       - text/plain
       responses:
         "200":
-          description: Success
+          description: user Exists
           schema:
             type: string
-      summary: Get a simple goodbye message
-      tags:
-      - Greeting
-  /hello:
-    get:
-      consumes:
-      - application/json
-      description: Returns a "Hello, World!" string
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: Success
+        "201":
+          description: user Created
           schema:
             type: string
-      summary: Get a simple greeting
+        "401":
+          description: user not found
+          schema:
+            type: string
+        "500":
+          description: error message
+          schema:
+            type: string
+      summary: Create or log a user
       tags:
-      - Greeting
+      - auth
 swagger: "2.0"
