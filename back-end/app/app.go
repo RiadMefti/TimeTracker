@@ -54,6 +54,8 @@ func RunApp() error {
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
+	// Swagger endpoint before
+	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	app.Use(middleware.AuthorizationMiddleware(firebaseService))
 
@@ -63,9 +65,6 @@ func RunApp() error {
 
 	//routes
 	routes.SetupAuthRoutes(app, authController)
-
-	// Swagger endpoint
-	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	app.Get("/hello", func(c *fiber.Ctx) error {
 

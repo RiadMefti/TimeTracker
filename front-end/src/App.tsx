@@ -25,6 +25,15 @@ const App: FC<AppProps> = ({ auth }) => {
       setUser(user);
       const token = await user.getIdToken();
 
+      const res = await fetch("http://localhost:3000/auth/login", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + (await user.getIdToken()),
+        },
+      });
+      setResponseFromServer(await res.text());
+      console.log(user.uid);
+      console.log(await user.getIdToken());
       console.log("User signed in:", user);
       console.log("Token:", token);
     } catch (error) {
