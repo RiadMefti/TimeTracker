@@ -9,6 +9,7 @@ import (
 	"github.com/RiadMefti/TimeTracker/back-end/repositories"
 	"github.com/RiadMefti/TimeTracker/back-end/routes"
 	"github.com/RiadMefti/TimeTracker/back-end/services"
+	"github.com/RiadMefti/TimeTracker/back-end/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -32,7 +33,7 @@ func RunApp() error {
 	if err != nil {
 		return err
 	}
-
+	defer db.Close()
 	//repositories
 	userRepository := repositories.NewUserRepository(db)
 
@@ -67,8 +68,7 @@ func RunApp() error {
 	routes.SetupAuthRoutes(app, authController)
 
 	app.Get("/hello", func(c *fiber.Ctx) error {
-
-		return c.SendString("hello")
+		return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, "hello from server", "hello sent successfully"))
 	})
 	log.Println("Starting server on port 3000")
 	errStart := app.Listen(":3000")

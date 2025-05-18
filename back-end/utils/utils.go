@@ -1,6 +1,10 @@
 package utils
 
-import "os"
+import (
+	"os"
+
+	"github.com/RiadMefti/TimeTracker/back-end/models"
+)
 
 func GetEnv(envVar string, fallback string) string {
 
@@ -11,4 +15,12 @@ func GetEnv(envVar string, fallback string) string {
 	}
 	return fallback
 
+}
+
+func CreateApiResponse[T any](success bool, data T, message string) models.ApiResponse[T] {
+	return models.ApiResponse[T]{
+		Success: success,
+		Data:    data,
+		Message: message,
+	}
 }

@@ -4,6 +4,7 @@ import (
 	"firebase.google.com/go/auth"
 	"github.com/RiadMefti/TimeTracker/back-end/models"
 	"github.com/RiadMefti/TimeTracker/back-end/services"
+	"github.com/RiadMefti/TimeTracker/back-end/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -26,24 +27,32 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 // @Failure 401 {string} string "user not found"
 // @Failure 500 {string} string "error message"
 // @Router /auth/login [post]
-func (u *AuthController) LoginUser(ctx *fiber.Ctx) error {
+func (u *AuthController) LoginUser(c *fiber.Ctx) error {
 
-	user, ok := ctx.Locals("user").(*auth.UserRecord)
+	userAuth, ok := c.Locals("user").(*auth.UserRecord)
 
-	if !ok || user == nil {
-		return ctx.Status(fiber.StatusUnauthorized).SendString("user not found")
+	if !ok || userAuth == nil {
+
+		return c.Status(fiber.StatusUnauthorized).JSON(utils.CreateApiResponse[interface{}](false, nil, "Can not find the user"))
 
 	}
-	created, err := u.authService.RegisterUser(models.User{
-		ID:    user.UID,
-		Email: user.Email,
-	})
+
+	user := models.User{
+		ID:    userAuth.UID,
+		Email: userAuth.Email,
+	}
+
+	created, err := u.authService.RegisterUser(user)
 
 	if err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusUnauthorized).JSON(utils.CreateApiResponse[interface{}](false, nil, "Error while creating user"))
+
 	}
 	if created {
-		return ctx.Status(fiber.StatusCreated).SendString("user Created")
+		return c.Status(fiber.StatusCreated).JSON(utils.CreateApiResponse(true, user, "user Created"))
+
 	}
-	return ctx.Status(fiber.StatusOK).SendString("user Exists")
+
+	return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, user, "user Exists and logged in"))
+
 }
