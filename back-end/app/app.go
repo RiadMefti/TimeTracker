@@ -36,9 +36,11 @@ func RunApp() error {
 	defer db.Close()
 	//repositories
 	userRepository := repositories.NewUserRepository(db)
+	projectRepository := repositories.NewProjectRepository(db)
 
 	//services
 	authService := services.NewAuthService(userRepository)
+	projectService := services.NewProjectService(projectRepository)
 	firebaseService, err := services.NewFirebaseService()
 	if err != nil {
 		return err
@@ -63,9 +65,11 @@ func RunApp() error {
 	//controllers
 
 	authController := controllers.NewAuthController(authService)
+	projectController := controllers.NewProjectController(projectService)
 
 	//routes
 	routes.SetupAuthRoutes(app, authController)
+	routes.SetupProjectRoutes(app, projectController)
 
 	app.Get("/hello", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, "hello from server", "hello sent successfully"))
