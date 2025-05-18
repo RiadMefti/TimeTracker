@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"firebase.google.com/go/auth"
 	"github.com/RiadMefti/TimeTracker/back-end/models"
 	"github.com/RiadMefti/TimeTracker/back-end/services"
 	"github.com/RiadMefti/TimeTracker/back-end/utils"
@@ -28,13 +27,9 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 // @Failure 500 {string} string "error message"
 // @Router /auth/login [post]
 func (u *AuthController) LoginUser(c *fiber.Ctx) error {
-
-	userAuth, ok := c.Locals("user").(*auth.UserRecord)
-
-	if !ok || userAuth == nil {
-
-		return c.Status(fiber.StatusUnauthorized).JSON(utils.CreateApiResponse[interface{}](false, nil, "Can not find the user"))
-
+	userAuth, ok := utils.GetUserOrAbort(c)
+	if !ok {
+		return nil
 	}
 
 	user := models.User{
@@ -43,16 +38,11 @@ func (u *AuthController) LoginUser(c *fiber.Ctx) error {
 	}
 
 	created, err := u.authService.RegisterUser(user)
-
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(utils.CreateApiResponse[interface{}](false, nil, "Error while creating user"))
-
 	}
 	if created {
 		return c.Status(fiber.StatusCreated).JSON(utils.CreateApiResponse(true, user, "user Created"))
-
 	}
-
 	return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, user, "user Exists and logged in"))
-
 }

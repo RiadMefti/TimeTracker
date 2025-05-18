@@ -3,7 +3,9 @@ package utils
 import (
 	"os"
 
+	"firebase.google.com/go/auth"
 	"github.com/RiadMefti/TimeTracker/back-end/models"
+	"github.com/gofiber/fiber/v2"
 )
 
 func GetEnv(envVar string, fallback string) string {
@@ -23,4 +25,13 @@ func CreateApiResponse[T any](success bool, data T, message string) models.ApiRe
 		Data:    data,
 		Message: message,
 	}
+}
+
+func GetUserOrAbort(c *fiber.Ctx) (*auth.UserRecord, bool) {
+	userAuth, ok := c.Locals("user").(*auth.UserRecord)
+	if !ok || userAuth == nil {
+		c.Status(fiber.StatusUnauthorized).JSON(CreateApiResponse[interface{}](false, nil, "Can not find the user"))
+		return nil, false
+	}
+	return userAuth, true
 }
