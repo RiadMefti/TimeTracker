@@ -1,7 +1,7 @@
 package models
 
 type ApiResponse[T any] struct {
-	Success bool   `json:"success"`
-	Data    T      `json:"data,omitempty"`
-	Message string `json:"message,omitempty"`
+	Success bool   `json:"Success"`
+	Data    T      `json:"Data,omitempty"`
+	Message string `json:"Message,omitempty"`
 }
