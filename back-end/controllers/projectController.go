@@ -56,7 +56,7 @@ func (p *ProjectController) UpdateUserProject(c *fiber.Ctx) error {
 		return nil
 	}
 
-	var projectToUpdate models.ProjectDto
+	var projectToUpdate models.Project
 	err := c.BodyParser(&projectToUpdate)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(utils.CreateApiResponse[interface{}](false, nil, "Invalid request body"))

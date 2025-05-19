@@ -16,7 +16,7 @@ func NewProjectRepository(db *sql.DB) *ProjectRepository {
 	}
 }
 
-func (r *ProjectRepository) GetUserProjects(userId string) ([]models.ProjectDto, error) {
+func (r *ProjectRepository) GetUserProjects(userId string) ([]models.Project, error) {
 
 	rows, err := r.db.Query("SELECT  id, name, description, color FROM projects WHERE user_id =($1)", userId)
 	if err != nil {
@@ -25,10 +25,10 @@ func (r *ProjectRepository) GetUserProjects(userId string) ([]models.ProjectDto,
 
 	defer rows.Close()
 
-	var projects []models.ProjectDto
+	var projects []models.Project
 
 	for rows.Next() {
-		var project models.ProjectDto
+		var project models.Project
 
 		err := rows.Scan(&project.ID, &project.Name, &project.Description, &project.Color)
 		if err != nil {
@@ -47,7 +47,7 @@ func (r *ProjectRepository) GetUserProjects(userId string) ([]models.ProjectDto,
 
 }
 
-func (r *ProjectRepository) CreateUserProject(projectToCreate models.ProjectCreate, userID string) ([]models.ProjectDto, error) {
+func (r *ProjectRepository) CreateUserProject(projectToCreate models.ProjectCreate, userID string) ([]models.Project, error) {
 	_, err := r.db.Exec(
 		"INSERT INTO projects (name, description, color, user_id) VALUES ($1, $2, $3, $4)",
 		projectToCreate.Name, projectToCreate.Description, projectToCreate.Color, userID,
@@ -58,7 +58,7 @@ func (r *ProjectRepository) CreateUserProject(projectToCreate models.ProjectCrea
 	return r.GetUserProjects(userID)
 }
 
-func (r *ProjectRepository) UpdateUserProject(projectToUpdate models.ProjectDto, userID string) ([]models.ProjectDto, error) {
+func (r *ProjectRepository) UpdateUserProject(projectToUpdate models.Project, userID string) ([]models.Project, error) {
 	_, err := r.db.Exec(
 		"UPDATE projects SET name = $1, description = $2, color = $3 WHERE id = $4 AND user_id = $5",
 		projectToUpdate.Name, projectToUpdate.Description, projectToUpdate.Color, projectToUpdate.ID, userID,
@@ -68,7 +68,7 @@ func (r *ProjectRepository) UpdateUserProject(projectToUpdate models.ProjectDto,
 	}
 	return r.GetUserProjects(userID)
 }
-func (r *ProjectRepository) DeleteUserProject(projectId string, userID string) ([]models.ProjectDto, error) {
+func (r *ProjectRepository) DeleteUserProject(projectId string, userID string) ([]models.Project, error) {
 
 	_, err := r.db.Exec(
 		"DELETE FROM projects WHERE id = ($1) AND user_id = ($2)",
