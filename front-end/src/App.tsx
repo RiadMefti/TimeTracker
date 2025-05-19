@@ -1,49 +1,15 @@
-import type { Auth, User } from "firebase/auth";
-import { useState, type FC, useEffect } from "react";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import type { Auth } from "firebase/auth";
+import { useState, type FC } from "react";
 import { Api } from "./api/Api";
+import { useAuth } from "./hooks/useAuth";
 
 interface AppProps {
   auth: Auth;
 }
 
 const App: FC<AppProps> = ({ auth }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, signInWithGoogle, signOut } = useAuth(auth);
   const [responseFromServer, setResponseFromServer] = useState<string>("");
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
-      setUser(firebaseUser);
-    });
-    return () => unsubscribe();
-  }, [auth]);
-
-  const signInWithGoogle = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      setUser(user);
-      const token = await user.getIdToken();
-
-      Api.authToken = token;
-      Api.initApiClasses();
-
-      const res = await Api.auth.login();
-      if (res.Success && res.Data) {
-        setResponseFromServer(
-          `${res.Message} --> ID = ${res.Data.ID} EMAIL =${res.Data.Email}`
-        );
-      }
-    } catch (error) {
-      console.error("Error signing in with Google:", error);
-    }
-  };
-
-  const disconnect = () => {
-    auth.signOut();
-    setUser(null);
-  };
 
   return (
     <div>
@@ -56,9 +22,7 @@ const App: FC<AppProps> = ({ auth }) => {
           <button
             onClick={async () => {
               const res = await Api.auth.login();
-              console.log(res.Success);
               if (res.Success && res.Data) {
-                console.log("oui");
                 setResponseFromServer(
                   `${res.Message} --> ID = ${res.Data.ID} EMAIL =${res.Data.Email}`
                 );
@@ -67,10 +31,14 @@ const App: FC<AppProps> = ({ auth }) => {
           >
             ping server
           </button>
-          <button onClick={disconnect}>Disconnect</button>
+          <button onClick={signOut}>Disconnect</button>
         </div>
       ) : (
-        <button onClick={signInWithGoogle}>
+        <button
+          onClick={async () => {
+            await signInWithGoogle();
+          }}
+        >
           <span>Sign in with Google</span>
         </button>
       )}
