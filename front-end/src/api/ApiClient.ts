@@ -103,6 +103,17 @@ export class ApiClient {
     return await this._fetchData(endpoint, options);
   }
 
+  public async patch<T, B>(
+    endpoint: string,
+    body?: B
+  ): Promise<ApiResponse<T>> {
+    const options: RequestInit = { method: "PATCH" };
+    if (body !== undefined && body !== null) {
+      options.body = JSON.stringify(body);
+    }
+    return await this._fetchData(endpoint, options);
+  }
+
   public async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     return await this._fetchData(endpoint, {
       method: "DELETE",
