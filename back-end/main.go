@@ -1,7 +1,12 @@
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
+// @security BearerAuth
+
 package main
 
 import (
-	// Import the generated docs file for Swagger documentation
 	"log"
 
 	"github.com/RiadMefti/TimeTracker/back-end/app"

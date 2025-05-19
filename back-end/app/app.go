@@ -15,7 +15,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
-	// Import the generated docs file for Swagger documentation
 	_ "github.com/RiadMefti/TimeTracker/back-end/docs"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
@@ -42,7 +41,7 @@ func RunApp() error {
 	//services
 	authService := services.NewAuthService(userRepository)
 	projectService := services.NewProjectService(projectRepository)
-	timeEntryService := services.NewTimeEntryService(timeEntryRepository) 
+	timeEntryService := services.NewTimeEntryService(timeEntryRepository)
 
 	firebaseService, err := services.NewFirebaseService()
 	if err != nil {
@@ -74,7 +73,7 @@ func RunApp() error {
 	//routes
 	routes.SetupAuthRoutes(app, authController)
 	routes.SetupProjectRoutes(app, projectController)
-	routes.SetupTimeEntryRoutes(app, timeEntryController) 
+	routes.SetupTimeEntryRoutes(app, timeEntryController)
 
 	app.Get("/hello", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, "hello from server", "hello sent successfully"))

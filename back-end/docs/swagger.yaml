@@ -129,6 +129,8 @@ paths:
           description: error message
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create or log a user
       tags:
       - auth
@@ -146,6 +148,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get all user projects
       tags:
       - projects
@@ -175,6 +179,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create a new project
       tags:
       - projects
@@ -204,6 +210,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update a project
       tags:
       - projects
@@ -227,6 +235,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete a project
       tags:
       - projects
@@ -244,6 +254,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get all user time entries
       tags:
       - time-entries
@@ -273,6 +285,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create a new time entry
       tags:
       - time-entries
@@ -302,6 +316,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update a time entry
       tags:
       - time-entries
@@ -329,6 +345,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete a time entry
       tags:
       - time-entries
@@ -365,7 +383,15 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ApiErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Assign a project to a time entry
       tags:
       - time-entries
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

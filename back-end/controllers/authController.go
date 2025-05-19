@@ -22,6 +22,7 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 // @Tags auth
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Success 201 {object} models.ApiResponse[models.User] "user Created"
 // @Success 200 {object} models.ApiResponse[models.User] "user Exists"
 // @Failure 401 {object} models.ApiErrorResponse "user not found"

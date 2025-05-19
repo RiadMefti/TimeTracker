@@ -21,6 +21,7 @@ func NewProjectController(projectService *services.ProjectService) *ProjectContr
 // @Description Retrieve all projects for the authenticated user
 // @Tags projects
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {object} models.ApiResponse[[]models.Project]
 // @Failure 500 {object} models.ApiErrorResponse
 // @Router /projects/ [get]
@@ -43,6 +44,7 @@ func (p *ProjectController) GetUserProjects(c *fiber.Ctx) error {
 // @Tags projects
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param project body models.ProjectCreate true "Project to create"
 // @Success 200 {object} models.ApiResponse[[]models.Project]
 // @Failure 400 {object} models.ApiErrorResponse
@@ -73,6 +75,7 @@ func (p *ProjectController) CreateUserProject(c *fiber.Ctx) error {
 // @Tags projects
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param project body models.Project true "Project to update"
 // @Success 200 {object} models.ApiResponse[[]models.Project]
 // @Failure 400 {object} models.ApiErrorResponse
@@ -102,6 +105,7 @@ func (p *ProjectController) UpdateUserProject(c *fiber.Ctx) error {
 // @Description Delete a project by ID for the authenticated user
 // @Tags projects
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Project ID"
 // @Success 200 {object} models.ApiResponse[[]models.Project]
 // @Failure 500 {object} models.ApiErrorResponse

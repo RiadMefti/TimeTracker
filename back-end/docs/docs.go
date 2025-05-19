@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/auth/login": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create or log a user",
                 "consumes": [
                     "application/json"
@@ -58,6 +63,11 @@ const docTemplate = `{
         },
         "/projects/": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve all projects for the authenticated user",
                 "produces": [
                     "application/json"
@@ -82,6 +92,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing project for the authenticated user",
                 "consumes": [
                     "application/json"
@@ -126,6 +141,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new project for the authenticated user",
                 "consumes": [
                     "application/json"
@@ -172,6 +192,11 @@ const docTemplate = `{
         },
         "/projects/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a project by ID for the authenticated user",
                 "produces": [
                     "application/json"
@@ -207,6 +232,11 @@ const docTemplate = `{
         },
         "/time-entries/": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieve all time entries for the authenticated user",
                 "produces": [
                     "application/json"
@@ -231,6 +261,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing time entry for the authenticated user",
                 "consumes": [
                     "application/json"
@@ -275,6 +310,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new time entry for the authenticated user",
                 "consumes": [
                     "application/json"
@@ -321,6 +361,11 @@ const docTemplate = `{
         },
         "/time-entries/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a time entry by ID for the authenticated user",
                 "produces": [
                     "application/json"
@@ -362,6 +407,11 @@ const docTemplate = `{
         },
         "/time-entries/{id}/assign-project": {
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Assign or unassign a project to a time entry for the authenticated user",
                 "consumes": [
                     "application/json"
@@ -566,6 +616,14 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

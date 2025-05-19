@@ -23,6 +23,7 @@ func NewTimeEntryController(timeEntryService *services.TimeEntryService) *TimeEn
 // @Description Retrieve all time entries for the authenticated user
 // @Tags time-entries
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
 // @Failure 500 {object} models.ApiErrorResponse
 // @Router /time-entries/ [get]
@@ -45,6 +46,7 @@ func (t *TimeEntryController) GetUserTimeEntries(c *fiber.Ctx) error {
 // @Tags time-entries
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param timeEntry body models.TimeEntryCreate true "Time entry to create"
 // @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
 // @Failure 400 {object} models.ApiErrorResponse
@@ -74,6 +76,7 @@ func (t *TimeEntryController) CreateTimeEntry(c *fiber.Ctx) error {
 // @Tags time-entries
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param timeEntry body models.TimeEntry true "Time entry to update"
 // @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
 // @Failure 400 {object} models.ApiErrorResponse
@@ -102,6 +105,7 @@ func (t *TimeEntryController) UpdateTimeEntry(c *fiber.Ctx) error {
 // @Description Delete a time entry by ID for the authenticated user
 // @Tags time-entries
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Time Entry ID"
 // @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
 // @Failure 400 {object} models.ApiErrorResponse
@@ -132,6 +136,7 @@ func (t *TimeEntryController) DeleteTimeEntry(c *fiber.Ctx) error {
 // @Tags time-entries
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path int true "Time Entry ID"
 // @Param project body models.AssignProjectPayload true "Project assignment payload"
 // @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
