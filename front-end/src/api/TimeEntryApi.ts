@@ -1,5 +1,9 @@
 import type IApiResponse from "../types/ApiResponse";
-import type { TimeEntry, TimeEntryCreate, AssignProjectPayload } from "../types/TimeEntry";
+import type {
+  TimeEntry,
+  TimeEntryCreate,
+  AssignProjectPayload,
+} from "../types/TimeEntry";
 import { ApiClient } from "./ApiClient";
 
 export class TimeEntryApi {
@@ -34,7 +38,10 @@ export class TimeEntryApi {
     );
   }
 
-  async assignProjectToTime(timeEntryId: number, payload: AssignProjectPayload) {
+  async assignProjectToTime(
+    timeEntryId: number,
+    payload: AssignProjectPayload
+  ) {
     return await this.apiClient.patch<TimeEntry[], AssignProjectPayload>(
       `/${this.group}/${timeEntryId}/assign-project`,
       payload
