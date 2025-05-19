@@ -35,6 +35,12 @@ func (r *TimeEntryRepository) GetUserTimeEntries(userID string) ([]models.TimeEn
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
+
+	// Initialize with empty slice instead of nil
+	if entries == nil {
+		entries = []models.TimeEntry{}
+	}
+
 	return entries, nil
 }
 

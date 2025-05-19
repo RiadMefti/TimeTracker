@@ -43,6 +43,11 @@ func (r *ProjectRepository) GetUserProjects(userId string) ([]models.Project, er
 		return nil, err
 	}
 
+	// Initialize with empty slice instead of nil
+	if projects == nil {
+		projects = []models.Project{}
+	}
+
 	return projects, nil
 
 }
