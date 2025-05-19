@@ -18,8 +18,11 @@ const docTemplate = `{
         "/auth/login": {
             "post": {
                 "description": "Create or log a user",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "tags": [
                     "auth"
@@ -29,27 +32,538 @@ const docTemplate = `{
                     "200": {
                         "description": "user Exists",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.ApiResponse-models_User"
                         }
                     },
                     "201": {
                         "description": "user Created",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.ApiResponse-models_User"
                         }
                     },
                     "401": {
                         "description": "user not found",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.ApiErrorResponse"
                         }
                     },
                     "500": {
                         "description": "error message",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/models.ApiErrorResponse"
                         }
                     }
+                }
+            }
+        },
+        "/projects/": {
+            "get": {
+                "description": "Retrieve all projects for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Get all user projects",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiResponse-array_models_Project"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing project for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Update a project",
+                "parameters": [
+                    {
+                        "description": "Project to update",
+                        "name": "project",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Project"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiResponse-array_models_Project"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new project for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Create a new project",
+                "parameters": [
+                    {
+                        "description": "Project to create",
+                        "name": "project",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ProjectCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiResponse-array_models_Project"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{id}": {
+            "delete": {
+                "description": "Delete a project by ID for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Delete a project",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Project ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiResponse-array_models_Project"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/time-entries/": {
+            "get": {
+                "description": "Retrieve all time entries for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time-entries"
+                ],
+                "summary": "Get all user time entries",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiResponse-array_models_TimeEntry"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing time entry for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time-entries"
+                ],
+                "summary": "Update a time entry",
+                "parameters": [
+                    {
+                        "description": "Time entry to update",
+                        "name": "timeEntry",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TimeEntry"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiResponse-array_models_TimeEntry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new time entry for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time-entries"
+                ],
+                "summary": "Create a new time entry",
+                "parameters": [
+                    {
+                        "description": "Time entry to create",
+                        "name": "timeEntry",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TimeEntryCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiResponse-array_models_TimeEntry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/time-entries/{id}": {
+            "delete": {
+                "description": "Delete a time entry by ID for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time-entries"
+                ],
+                "summary": "Delete a time entry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Time Entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiResponse-array_models_TimeEntry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/time-entries/{id}/assign-project": {
+            "patch": {
+                "description": "Assign or unassign a project to a time entry for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "time-entries"
+                ],
+                "summary": "Assign a project to a time entry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Time Entry ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Project assignment payload",
+                        "name": "project",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AssignProjectPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiResponse-array_models_TimeEntry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ApiErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.ApiErrorResponse": {
+            "type": "object",
+            "properties": {
+                "Message": {
+                    "type": "string"
+                },
+                "Success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.ApiResponse-array_models_Project": {
+            "type": "object",
+            "properties": {
+                "Data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Project"
+                    }
+                },
+                "Message": {
+                    "type": "string"
+                },
+                "Success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.ApiResponse-array_models_TimeEntry": {
+            "type": "object",
+            "properties": {
+                "Data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TimeEntry"
+                    }
+                },
+                "Message": {
+                    "type": "string"
+                },
+                "Success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.ApiResponse-models_User": {
+            "type": "object",
+            "properties": {
+                "Data": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "Message": {
+                    "type": "string"
+                },
+                "Success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.AssignProjectPayload": {
+            "type": "object",
+            "properties": {
+                "ProjectID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Project": {
+            "type": "object",
+            "properties": {
+                "Color": {
+                    "type": "string"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "ID": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ProjectCreate": {
+            "type": "object",
+            "properties": {
+                "Color": {
+                    "type": "string"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "Name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TimeEntry": {
+            "type": "object",
+            "properties": {
+                "Description": {
+                    "type": "string"
+                },
+                "EndDate": {
+                    "type": "string"
+                },
+                "ID": {
+                    "type": "integer"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "ProjectID": {
+                    "type": "integer"
+                },
+                "StartDate": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TimeEntryCreate": {
+            "type": "object",
+            "properties": {
+                "Description": {
+                    "type": "string"
+                },
+                "EndDate": {
+                    "type": "string"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "ProjectID": {
+                    "type": "integer"
+                },
+                "StartDate": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "Email": {
+                    "type": "string"
+                },
+                "ID": {
+                    "type": "string"
                 }
             }
         }

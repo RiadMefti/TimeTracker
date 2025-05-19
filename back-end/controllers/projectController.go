@@ -17,6 +17,13 @@ func NewProjectController(projectService *services.ProjectService) *ProjectContr
 	}
 }
 
+// @Summary Get all user projects
+// @Description Retrieve all projects for the authenticated user
+// @Tags projects
+// @Produce json
+// @Success 200 {object} models.ApiResponse[[]models.Project]
+// @Failure 500 {object} models.ApiErrorResponse
+// @Router /projects/ [get]
 func (p *ProjectController) GetUserProjects(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)
 	if !ok {
@@ -31,6 +38,16 @@ func (p *ProjectController) GetUserProjects(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, projects, "projects retrieved successfully"))
 }
 
+// @Summary Create a new project
+// @Description Create a new project for the authenticated user
+// @Tags projects
+// @Accept json
+// @Produce json
+// @Param project body models.ProjectCreate true "Project to create"
+// @Success 200 {object} models.ApiResponse[[]models.Project]
+// @Failure 400 {object} models.ApiErrorResponse
+// @Failure 500 {object} models.ApiErrorResponse
+// @Router /projects/ [post]
 func (p *ProjectController) CreateUserProject(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)
 	if !ok {
@@ -50,6 +67,17 @@ func (p *ProjectController) CreateUserProject(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, projects, "Project created successfully"))
 }
+
+// @Summary Update a project
+// @Description Update an existing project for the authenticated user
+// @Tags projects
+// @Accept json
+// @Produce json
+// @Param project body models.Project true "Project to update"
+// @Success 200 {object} models.ApiResponse[[]models.Project]
+// @Failure 400 {object} models.ApiErrorResponse
+// @Failure 500 {object} models.ApiErrorResponse
+// @Router /projects/ [put]
 func (p *ProjectController) UpdateUserProject(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)
 	if !ok {
@@ -69,6 +97,15 @@ func (p *ProjectController) UpdateUserProject(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, projects, "project updated successfully"))
 
 }
+
+// @Summary Delete a project
+// @Description Delete a project by ID for the authenticated user
+// @Tags projects
+// @Produce json
+// @Param id path int true "Project ID"
+// @Success 200 {object} models.ApiResponse[[]models.Project]
+// @Failure 500 {object} models.ApiErrorResponse
+// @Router /projects/{id} [delete]
 func (p *ProjectController) DeleteUserProject(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)
 	if !ok {

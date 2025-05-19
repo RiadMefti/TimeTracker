@@ -20,11 +20,12 @@ func NewAuthController(authService *services.AuthService) *AuthController {
 // @Summary Create or log a user
 // @Description Create or log a user
 // @Tags auth
-// @Produce plain
-// @Success 201 {string} string "user Created"
-// @Success 200 {string} string "user Exists"
-// @Failure 401 {string} string "user not found"
-// @Failure 500 {string} string "error message"
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.ApiResponse[models.User] "user Created"
+// @Success 200 {object} models.ApiResponse[models.User] "user Exists"
+// @Failure 401 {object} models.ApiErrorResponse "user not found"
+// @Failure 500 {object} models.ApiErrorResponse "error message"
 // @Router /auth/login [post]
 func (u *AuthController) LoginUser(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)

@@ -19,6 +19,13 @@ func NewTimeEntryController(timeEntryService *services.TimeEntryService) *TimeEn
 	}
 }
 
+// @Summary Get all user time entries
+// @Description Retrieve all time entries for the authenticated user
+// @Tags time-entries
+// @Produce json
+// @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
+// @Failure 500 {object} models.ApiErrorResponse
+// @Router /time-entries/ [get]
 func (t *TimeEntryController) GetUserTimeEntries(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)
 	if !ok {
@@ -33,6 +40,16 @@ func (t *TimeEntryController) GetUserTimeEntries(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, entries, "Time entries retrieved successfully"))
 }
 
+// @Summary Create a new time entry
+// @Description Create a new time entry for the authenticated user
+// @Tags time-entries
+// @Accept json
+// @Produce json
+// @Param timeEntry body models.TimeEntryCreate true "Time entry to create"
+// @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
+// @Failure 400 {object} models.ApiErrorResponse
+// @Failure 500 {object} models.ApiErrorResponse
+// @Router /time-entries/ [post]
 func (t *TimeEntryController) CreateTimeEntry(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)
 	if !ok {
@@ -52,6 +69,16 @@ func (t *TimeEntryController) CreateTimeEntry(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, entries, "Time entry created successfully"))
 }
 
+// @Summary Update a time entry
+// @Description Update an existing time entry for the authenticated user
+// @Tags time-entries
+// @Accept json
+// @Produce json
+// @Param timeEntry body models.TimeEntry true "Time entry to update"
+// @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
+// @Failure 400 {object} models.ApiErrorResponse
+// @Failure 500 {object} models.ApiErrorResponse
+// @Router /time-entries/ [put]
 func (t *TimeEntryController) UpdateTimeEntry(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)
 	if !ok {
@@ -71,6 +98,15 @@ func (t *TimeEntryController) UpdateTimeEntry(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, entries, "Time entry updated successfully"))
 }
 
+// @Summary Delete a time entry
+// @Description Delete a time entry by ID for the authenticated user
+// @Tags time-entries
+// @Produce json
+// @Param id path int true "Time Entry ID"
+// @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
+// @Failure 400 {object} models.ApiErrorResponse
+// @Failure 500 {object} models.ApiErrorResponse
+// @Router /time-entries/{id} [delete]
 func (t *TimeEntryController) DeleteTimeEntry(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)
 	if !ok {
@@ -91,6 +127,17 @@ func (t *TimeEntryController) DeleteTimeEntry(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, entries, "Time entry deleted successfully"))
 }
 
+// @Summary Assign a project to a time entry
+// @Description Assign or unassign a project to a time entry for the authenticated user
+// @Tags time-entries
+// @Accept json
+// @Produce json
+// @Param id path int true "Time Entry ID"
+// @Param project body models.AssignProjectPayload true "Project assignment payload"
+// @Success 200 {object} models.ApiResponse[[]models.TimeEntry]
+// @Failure 400 {object} models.ApiErrorResponse
+// @Failure 500 {object} models.ApiErrorResponse
+// @Router /time-entries/{id}/assign-project [patch]
 func (t *TimeEntryController) AssignProjectToTime(c *fiber.Ctx) error {
 	userAuth, ok := utils.GetUserOrAbort(c)
 	if !ok {
@@ -103,9 +150,7 @@ func (t *TimeEntryController) AssignProjectToTime(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(utils.CreateApiResponse[interface{}](false, nil, "Invalid time entry ID"))
 	}
 
-	var payload struct {
-		ProjectID *int `json:"ProjectID"`
-	}
+	var payload models.AssignProjectPayload
 	if err := c.BodyParser(&payload); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(utils.CreateApiResponse[interface{}](false, nil, "Invalid request body"))
 	}

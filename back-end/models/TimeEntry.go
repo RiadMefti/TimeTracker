@@ -18,3 +18,8 @@ type TimeEntryCreate struct {
 	StartDate   time.Time `json:"StartDate"`
 	EndDate     time.Time `json:"EndDate"`
 }
+
+// swagger:model
+type AssignProjectPayload struct {
+	ProjectID *int `json:"ProjectID"`
+}
