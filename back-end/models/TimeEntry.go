@@ -4,7 +4,6 @@ import "time"
 
 type TimeEntry struct {
 	ID          int       `json:"ID"`
-	Name        string    `json:"Name"`
 	Description string    `json:"Description"`
 	ProjectID   *int      `json:"ProjectID"`
 	StartDate   time.Time `json:"StartDate"`
@@ -12,7 +11,6 @@ type TimeEntry struct {
 }
 
 type TimeEntryCreate struct {
-	Name        string    `json:"Name"`
 	Description string    `json:"Description"`
 	ProjectID   *int      `json:"ProjectID"`
 	StartDate   time.Time `json:"StartDate"`
