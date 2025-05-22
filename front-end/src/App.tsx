@@ -2,6 +2,7 @@ import type { Auth } from "firebase/auth";
 import { useState, type FC } from "react";
 import { Api } from "./api/Api";
 import { useAuth } from "./hooks/useAuth";
+import Menu from "./components/menu/Menu";
 
 interface AppProps {
   auth: Auth;
@@ -13,6 +14,7 @@ const App: FC<AppProps> = ({ auth }) => {
 
   return (
     <div>
+      <Menu />
       <h1>Time Tracker App</h1>
       {user ? (
         <div>

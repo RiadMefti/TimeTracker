@@ -1,0 +1,63 @@
+@font-face {
+  font-family: "MaisonNeue";
+  src: local("MaisonNeue"),
+    url("assets/fonts/MaisonNeue-Bold.ttf") format("truetype");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: "MaisonNeue";
+  src: local("MaisonNeue"),
+    url("assets/fonts/MaisonNeue-Light.ttf") format("truetype");
+  font-weight: normal;
+}
+
+#root {
+  margin: 0;
+  height: 100%;
+  /* font-family: Roboto, "Helvetica Neue", sans-serif; */
+  font-family: MaisonNeue;
+  background-color: #0D1D27;
+  color: white;
+
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  /* font-family: Roboto, "Helvetica Neue", sans-serif; */
+  font-family: MaisonNeue;
+  background-color: #0D1D27;
+  color: white;
+}
+
+
+/******* Scrollbar *******/
+/* width */
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 10px;
+}
+
+/* Track */
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 1px 1px 0px grey, inset -1px -1px 0px grey;
+  border-radius: 2px;
+}
+
+/* Handle */
+
+::-webkit-scrollbar-thumb {
+  background: rgb(204, 204, 204);
+  border-radius: 2px;
+}
+
+/* Handle on hover */
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7c7c7c;
+}
+
+/******* End Scrollbar *******/
