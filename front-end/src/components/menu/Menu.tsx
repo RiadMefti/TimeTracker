@@ -14,16 +14,21 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import FolderIcon from "@mui/icons-material/Folder";
-import { useState } from "react";
 import type { FC } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { auth } from "../../firebase";
 
 interface MenuItem {
   name: string;
   path: string;
   icon: React.ReactNode;
 }
+
 const Menu: FC = () => {
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth(auth);
 
   const menuItems: MenuItem[] = [
     {
@@ -43,8 +48,17 @@ const Menu: FC = () => {
     },
   ];
 
-  const handleMenuItemClick = (itemName: string) => {
-    setActiveItem(itemName);
+  const handleMenuItemClick = (path: string) => {
+    navigate(path);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
 
   return (
@@ -99,19 +113,17 @@ const Menu: FC = () => {
         {menuItems.map((item) => (
           <ListItem key={item.name} disablePadding sx={{ mb: 0.5 }}>
             <ListItemButton
-              onClick={() => handleMenuItemClick(item.name)}
+              onClick={() => handleMenuItemClick(item.path)}
               disableRipple
               sx={{
                 borderRadius: 1,
-                backgroundColor:
-                  activeItem === item.name
-                    ? "rgba(10, 125, 255, 0.2)"
-                    : "transparent",
+                backgroundColor: isActive(item.path)
+                  ? "rgba(10, 125, 255, 0.2)"
+                  : "transparent",
                 "&:hover": {
-                  backgroundColor:
-                    activeItem === item.name
-                      ? "rgba(10, 125, 255, 0.3)"
-                      : "rgba(255, 255, 255, 0.08)",
+                  backgroundColor: isActive(item.path)
+                    ? "rgba(10, 125, 255, 0.3)"
+                    : "rgba(255, 255, 255, 0.08)",
                 },
                 transition: "background-color 0.2s",
               }}
@@ -119,7 +131,7 @@ const Menu: FC = () => {
               <ListItemIcon
                 sx={{
                   minWidth: 40,
-                  color: activeItem === item.name ? "#0a7dff" : "inherit",
+                  color: isActive(item.path) ? "#0a7dff" : "inherit",
                 }}
               >
                 {item.icon}
@@ -129,7 +141,7 @@ const Menu: FC = () => {
                 slotProps={{
                   primary: {
                     style: {
-                      fontWeight: activeItem === item.name ? 600 : 400,
+                      fontWeight: isActive(item.path) ? 600 : 400,
                       fontSize: "0.95rem",
                     },
                   },
@@ -149,6 +161,7 @@ const Menu: FC = () => {
         <List>
           <ListItem disablePadding>
             <ListItemButton
+              onClick={handleLogout}
               disableRipple
               sx={{
                 borderRadius: 1,

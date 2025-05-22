@@ -1,50 +1,66 @@
 import type { Auth } from "firebase/auth";
-import { useState, type FC } from "react";
-import { Api } from "./api/Api";
+import { type FC } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { useAuth } from "./hooks/useAuth";
-import Menu from "./components/menu/Menu";
+import MainLayout from "./components/layout/MainLayout";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import TimeEntriesPage from "./pages/TimeEntriesPage";
+import ProjectsPage from "./pages/ProjectsPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 interface AppProps {
   auth: Auth;
 }
 
 const App: FC<AppProps> = ({ auth }) => {
-  const { user, signInWithGoogle, signOut } = useAuth(auth);
-  const [responseFromServer, setResponseFromServer] = useState<string>("");
+  // Initialize auth to set up the user in the store
+  useAuth(auth);
 
   return (
-    <div>
-      <Menu />
-      <h1>Time Tracker App</h1>
-      {user ? (
-        <div>
-          <p>Welcome, {user.displayName}!</p>
-          <p>Email: {user.email}</p>
-          <p>x:{responseFromServer}</p>
-          <button
-            onClick={async () => {
-              const res = await Api.auth.login();
-              if (res.Success && res.Data) {
-                setResponseFromServer(
-                  `${res.Message} --> ID = ${res.Data.ID} EMAIL =${res.Data.Email}`
-                );
-              }
-            }}
-          >
-            ping server
-          </button>
-          <button onClick={signOut}>Disconnect</button>
-        </div>
-      ) : (
-        <button
-          onClick={async () => {
-            await signInWithGoogle();
-          }}
-        >
-          <span>Sign in with Google</span>
-        </button>
-      )}
-    </div>
+    <Router>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <DashboardPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/time-entries"
+          element={
+            <MainLayout>
+              <TimeEntriesPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <MainLayout>
+              <ProjectsPage />
+            </MainLayout>
+          }
+        />
+
+        {/* Redirects */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+        {/* Not Found */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Router>
   );
 };
 
