@@ -4,7 +4,7 @@ import { Api } from "../api/Api";
 import { useUserStore } from "../stores/userStore";
 
 export function useAuth(auth: Auth) {
-  const { resetUser, setUser, user } = useUserStore();
+  const { resetUser, setUser, setAuthInitialized, user } = useUserStore();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
@@ -16,9 +16,10 @@ export function useAuth(auth: Auth) {
       } else {
         Api.authToken = undefined;
       }
+      setAuthInitialized(true);
     });
     return () => unsubscribe();
-  }, [auth, setUser]);
+  }, [auth, setUser, setAuthInitialized]);
 
   const signInWithGoogle = useCallback(async () => {
     const provider = new GoogleAuthProvider();

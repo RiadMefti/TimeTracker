@@ -1,5 +1,5 @@
 import type { FC, ReactNode } from "react";
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import Menu from "../menu/Menu";
 import { Navigate } from "react-router-dom";
 import { useUserStore } from "../../stores/userStore";
@@ -9,7 +9,22 @@ interface MainLayoutProps {
 }
 
 const MainLayout: FC<MainLayoutProps> = ({ children }) => {
-  const { user } = useUserStore();
+  const { user, authInitialized } = useUserStore();
+
+  if (!authInitialized) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (!user) {
     return <Navigate to="/login" />;

@@ -1,6 +1,11 @@
 import type { FC } from "react";
-import { Box, Button, Paper, Typography } from "@mui/material";
-
+import {
+  Box,
+  Button,
+  Paper,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { Navigate } from "react-router-dom";
 
 import Logo from "../assets/logo/timer.svg";
@@ -10,7 +15,22 @@ import { auth } from "../firebase";
 
 const LoginPage: FC = () => {
   const { signInWithGoogle } = useAuth(auth);
-  const { user } = useUserStore();
+  const { user, authInitialized } = useUserStore();
+
+  if (!authInitialized) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (user) {
     return <Navigate to="/dashboard" />;
