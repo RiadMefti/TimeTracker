@@ -19,7 +19,7 @@ export const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: 'MaisonNeue, Roboto, "Helvetica Neue", sans-serif',
+    fontFamily: 'Poppins, Roboto, "Helvetica Neue", sans-serif',
   },
   components: {
     MuiDialog: {

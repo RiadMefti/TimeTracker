@@ -1,22 +1,10 @@
-@font-face {
-  font-family: "MaisonNeue";
-  src: local("MaisonNeue"),
-    url("assets/fonts/MaisonNeue-Bold.ttf") format("truetype");
-  font-weight: bold;
-}
-
-@font-face {
-  font-family: "MaisonNeue";
-  src: local("MaisonNeue"),
-    url("assets/fonts/MaisonNeue-Light.ttf") format("truetype");
-  font-weight: normal;
-}
+/* Import Poppins from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 #root {
   margin: 0;
   height: 100%;
-  /* font-family: Roboto, "Helvetica Neue", sans-serif; */
-  font-family: MaisonNeue;
+  font-family: Poppins, "Helvetica Neue", sans-serif;
   background-color: #0D1D27;
   color: white;
 
@@ -25,8 +13,7 @@
 body {
   margin: 0;
   height: 100%;
-  /* font-family: Roboto, "Helvetica Neue", sans-serif; */
-  font-family: MaisonNeue;
+  font-family: Poppins, "Helvetica Neue", sans-serif;
   background-color: #0D1D27;
   color: white;
 }
