@@ -14,6 +14,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import FolderIcon from "@mui/icons-material/Folder";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import type { FC } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
@@ -45,6 +46,11 @@ const Menu: FC = () => {
       name: "Projects",
       path: "/projects",
       icon: <FolderIcon />,
+    },
+    {
+      name: "Profile",
+      path: "/profile",
+      icon: <AccountCircleIcon />,
     },
   ];
 

@@ -38,9 +38,14 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
         sx={{
           p: 3,
           minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        {children}
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          {children}
+        </Box>
       </Box>
     </Box>
   );

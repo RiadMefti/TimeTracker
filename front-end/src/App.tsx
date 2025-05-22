@@ -13,6 +13,7 @@ import DashboardPage from "./pages/DashboardPage";
 import TimeEntriesPage from "./pages/TimeEntriesPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import ProfilePage from "./pages/ProfilePage";
 
 interface AppProps {
   auth: Auth;
@@ -50,6 +51,14 @@ const App: FC<AppProps> = ({ auth }) => {
           element={
             <MainLayout>
               <ProjectsPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <MainLayout>
+              <ProfilePage />
             </MainLayout>
           }
         />
