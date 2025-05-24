@@ -2,8 +2,8 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS times(
     id serial PRIMARY KEY,
-    start_date Date NOT NULL,
-    end_date Date NOT NULL,
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
     description text,
     user_id text NOT NULL,
     project_id integer,

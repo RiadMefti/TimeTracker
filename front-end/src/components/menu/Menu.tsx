@@ -19,6 +19,7 @@ import type { FC } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { auth } from "../../firebase";
+import Chronometer from "../chronometer/Chronometer";
 
 interface MenuItem {
   name: string;
@@ -110,6 +111,13 @@ const Menu: FC = () => {
         >
           Time-Tracker
         </Typography>
+      </Box>
+
+      <Divider />
+
+      {/* Compact Chronometer */}
+      <Box sx={{ p: 2 }}>
+        <Chronometer variant="compact" />
       </Box>
 
       <Divider />

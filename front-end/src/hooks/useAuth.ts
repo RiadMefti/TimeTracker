@@ -29,7 +29,7 @@ export function useAuth(auth: Auth) {
     const token = await user.getIdToken();
     Api.authToken = token;
     Api.initApiClasses();
-    return user;
+    return await Api.auth.login();
   }, [auth, setUser]);
 
   const signOut = useCallback(async () => {
