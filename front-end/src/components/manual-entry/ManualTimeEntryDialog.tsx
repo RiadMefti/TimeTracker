@@ -21,6 +21,7 @@ import {
   AccessTime as TimeIcon,
   Schedule as ScheduleIcon,
   Add as AddIcon,
+  Edit as EditIcon,
 } from "@mui/icons-material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -28,16 +29,18 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useTimeEntryStore } from "../../stores/TimeEntryStore";
 import { useProjectStore } from "../../stores/ProjectStore";
-import type { TimeEntryCreate } from "../../types/TimeEntry";
+import type { TimeEntry, TimeEntryCreate } from "../../types/TimeEntry";
 
 interface ManualTimeEntryDialogProps {
   open: boolean;
   onClose: () => void;
+  editingEntry?: TimeEntry | null;
 }
 
 const ManualTimeEntryDialog: React.FC<ManualTimeEntryDialogProps> = ({
   open,
   onClose,
+  editingEntry,
 }) => {
   const [description, setDescription] = useState("");
   const [projectId, setProjectId] = useState<number | null>(null);
@@ -46,20 +49,28 @@ const ManualTimeEntryDialog: React.FC<ManualTimeEntryDialogProps> = ({
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { createTimeEntry } = useTimeEntryStore();
+  const { createTimeEntry, updateTimeEntry } = useTimeEntryStore();
   const { projects, fetchProjects } = useProjectStore();
 
   useEffect(() => {
     if (open) {
       fetchProjects();
-      // Reset form when dialog opens
-      setDescription("");
-      setProjectId(null);
-      setStartDate(dayjs());
-      setEndDate(dayjs().add(1, "hour"));
+      if (editingEntry) {
+        // Populate form with editing entry data
+        setDescription(editingEntry.Description || "");
+        setProjectId(editingEntry.ProjectID);
+        setStartDate(dayjs(editingEntry.StartDate));
+        setEndDate(dayjs(editingEntry.EndDate));
+      } else {
+        // Reset form when creating new entry
+        setDescription("");
+        setProjectId(null);
+        setStartDate(dayjs());
+        setEndDate(dayjs().add(1, "hour"));
+      }
       setError("");
     }
-  }, [open, fetchProjects]);
+  }, [open, editingEntry, fetchProjects]);
 
   const handleClose = () => {
     setError("");
@@ -94,18 +105,37 @@ const ManualTimeEntryDialog: React.FC<ManualTimeEntryDialogProps> = ({
     setError("");
 
     try {
-      const timeEntry: TimeEntryCreate = {
-        Description: description.trim(),
-        ProjectID: projectId,
-        StartDate: startDate.toISOString(),
-        EndDate: endDate.toISOString(),
-      };
-
-      await createTimeEntry(timeEntry);
+      if (editingEntry) {
+        // Update existing entry
+        const updatedEntry: TimeEntry = {
+          ID: editingEntry.ID,
+          Description: description.trim(),
+          ProjectID: projectId,
+          StartDate: startDate.toISOString(),
+          EndDate: endDate.toISOString(),
+        };
+        await updateTimeEntry(updatedEntry);
+      } else {
+        // Create new entry
+        const timeEntry: TimeEntryCreate = {
+          Description: description.trim(),
+          ProjectID: projectId,
+          StartDate: startDate.toISOString(),
+          EndDate: endDate.toISOString(),
+        };
+        await createTimeEntry(timeEntry);
+      }
       handleClose();
     } catch (error) {
-      console.error("Failed to create time entry:", error);
-      setError("Failed to create time entry. Please try again.");
+      console.error(
+        `Failed to ${editingEntry ? "update" : "create"} time entry:`,
+        error
+      );
+      setError(
+        `Failed to ${
+          editingEntry ? "update" : "create"
+        } time entry. Please try again.`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -160,9 +190,13 @@ const ManualTimeEntryDialog: React.FC<ManualTimeEntryDialogProps> = ({
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <AddIcon sx={{ color: "#0a7dff", fontSize: 24 }} />
+            {editingEntry ? (
+              <EditIcon sx={{ color: "#0a7dff", fontSize: 24 }} />
+            ) : (
+              <AddIcon sx={{ color: "#0a7dff", fontSize: 24 }} />
+            )}
             <Typography variant="h6" sx={{ fontWeight: 600, color: "#ffffff" }}>
-              Add Manual Time Entry
+              {editingEntry ? "Edit Time Entry" : "Add Manual Time Entry"}
             </Typography>
           </Box>
           <IconButton
@@ -367,7 +401,7 @@ const ManualTimeEntryDialog: React.FC<ManualTimeEntryDialogProps> = ({
             pt: 1.5,
             borderTop: "1px solid rgba(255, 255, 255, 0.1)",
             gap: 2,
-            flexShrink: 0, 
+            flexShrink: 0,
           }}
         >
           <Button
@@ -400,7 +434,13 @@ const ManualTimeEntryDialog: React.FC<ManualTimeEntryDialogProps> = ({
               px: 3,
             }}
           >
-            {isLoading ? "Adding..." : "Add Time Entry"}
+            {isLoading
+              ? editingEntry
+                ? "Updating..."
+                : "Adding..."
+              : editingEntry
+              ? "Update Time Entry"
+              : "Add Time Entry"}
           </Button>
         </DialogActions>
       </Dialog>

@@ -495,8 +495,6 @@ const ProjectsPage: FC = () => {
           <Typography sx={{ color: "rgba(255, 255, 255, 0.8)" }}>
             Are you sure you want to delete{" "}
             <strong style={{ color: "#fff" }}>"{projectToDelete?.Name}"</strong>
-            ? This action cannot be undone and will remove all associated time
-            entries.
           </Typography>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
