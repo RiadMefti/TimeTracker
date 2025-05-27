@@ -102,11 +102,13 @@ export const theme = createTheme({
       defaultProps: {
         size: "small",
         MenuProps: {
-          PaperProps: {
-            sx: {
-              backgroundColor: "#1a2c38",
-              backgroundImage: "none",
-              boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+          slotProps: {
+            paper: {
+              sx: {
+                backgroundColor: "#1a2c38",
+                backgroundImage: "none",
+                boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+              },
             },
           },
         },

@@ -6,7 +6,7 @@ interface IUseProjectStore {
   projects: Project[];
   setProjects: (projects: Project[]) => void;
   fetchProjects: () => Promise<void>;
-  createProject: (project: Project) => Promise<void>;
+  createProject: (project: ProjectCreate) => Promise<void>;
   updateProject: (project: Project) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
 }
