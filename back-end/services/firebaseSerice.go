@@ -23,6 +23,12 @@ func NewFirebaseService() (*firebase.App, error) {
 	clientID := os.Getenv("FIREBASE_CLIENT_ID")
 
 	if projectID != "" && privateKeyID != "" && privateKey != "" && clientEmail != "" && clientID != "" {
+		// Handle multiple escaping levels that can occur in deployment platforms
+		// First handle double-escaped newlines (\\\\n -> \\n)
+		privateKey = strings.ReplaceAll(privateKey, "\\\\n", "\\n")
+		// Then convert escaped newlines to actual newlines (\\n -> \n)
+		privateKey = strings.ReplaceAll(privateKey, "\\n", "\n")
+		
 		// Build credentials JSON from individual environment variables
 		credentials := map[string]interface{}{
 			"type":                        "service_account",
