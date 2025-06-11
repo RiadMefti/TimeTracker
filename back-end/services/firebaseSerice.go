@@ -24,15 +24,24 @@ func NewFirebaseService() (*firebase.App, error) {
 		var temp map[string]interface{}
 		err := json.Unmarshal([]byte(credentialsJSON), &temp)
 		
-		// If parsing fails, try fixing double-escaped characters
+		// If parsing fails, try fixing different escaping scenarios
 		if err != nil {
-			// Handle double-escaped newlines (\\n -> \n) - keep as escaped for JSON
-			credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\\\n", "\\n")
-			// Handle double-escaped quotes (\\\" -> \")
-			credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\\\\"", "\\\"")
+			// First, try handling literal newlines by escaping them
+			credentialsJSON = strings.ReplaceAll(credentialsJSON, "\n", "\\n")
 			
 			// Try parsing again
 			err = json.Unmarshal([]byte(credentialsJSON), &temp)
+			
+			// If still failing, try handling double-escaped characters
+			if err != nil {
+				// Handle double-escaped newlines (\\n -> \n) - keep as escaped for JSON
+				credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\\\n", "\\n")
+				// Handle double-escaped quotes (\\\" -> \")
+				credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\\\\"", "\\\"")
+				
+				// Try parsing again
+				err = json.Unmarshal([]byte(credentialsJSON), &temp)
+			}
 		}
 		
 		// If still failing, the JSON is invalid
