@@ -19,17 +19,24 @@ func NewFirebaseService() (*firebase.App, error) {
 	// This should contain the entire JSON content as a string
 	credentialsJSON := os.Getenv("FIREBASE_CREDENTIALS_JSON")
 	if credentialsJSON != "" {
-		// Handle multiple layers of escaping that can occur in deployment platforms
-		// First, handle double-escaped newlines (\\n -> \n)
-		credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\\\n", "\\n")
-		// Then handle single-escaped newlines (\n -> actual newlines)
-		credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\n", "\n")
-		// Handle escaped quotes if any
-		credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\\"", "\"")
-		
-		// Validate JSON before using it
+		// Handle different escaping scenarios from deployment platforms
+		// Try to parse as-is first
 		var temp map[string]interface{}
-		if err := json.Unmarshal([]byte(credentialsJSON), &temp); err != nil {
+		err := json.Unmarshal([]byte(credentialsJSON), &temp)
+		
+		// If parsing fails, try fixing double-escaped characters
+		if err != nil {
+			// Handle double-escaped newlines (\\n -> \n) - keep as escaped for JSON
+			credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\\\n", "\\n")
+			// Handle double-escaped quotes (\\\" -> \")
+			credentialsJSON = strings.ReplaceAll(credentialsJSON, "\\\\\"", "\\\"")
+			
+			// Try parsing again
+			err = json.Unmarshal([]byte(credentialsJSON), &temp)
+		}
+		
+		// If still failing, the JSON is invalid
+		if err != nil {
 			return nil, fmt.Errorf("invalid JSON in FIREBASE_CREDENTIALS_JSON: %v", err)
 		}
 		
