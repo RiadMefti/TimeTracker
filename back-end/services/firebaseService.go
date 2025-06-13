@@ -14,7 +14,15 @@ import (
 func NewFirebaseService() (*firebase.App, error) {
 
 	var opt option.ClientOption
-
+	if _, err := os.Stat("key.json"); err == nil {
+		// Use credentials file if it exists
+		opt := option.WithCredentialsFile("key.json")
+		app, err := firebase.NewApp(context.Background(), nil, opt)
+		if err != nil {
+			return nil, fmt.Errorf("error initializing app with credentials file: %v", err)
+		}
+		return app, nil
+	}
 	// Try individual environment variables first (cleaner approach)
 	projectID := os.Getenv("FIREBASE_PROJECT_ID")
 	privateKeyID := os.Getenv("FIREBASE_PRIVATE_KEY_ID")
@@ -28,7 +36,7 @@ func NewFirebaseService() (*firebase.App, error) {
 		privateKey = strings.ReplaceAll(privateKey, "\\\\n", "\\n")
 		// Then convert escaped newlines to actual newlines (\\n -> \n)
 		privateKey = strings.ReplaceAll(privateKey, "\\n", "\n")
-		
+
 		// Build credentials JSON from individual environment variables
 		credentials := map[string]interface{}{
 			"type":                        "service_account",
