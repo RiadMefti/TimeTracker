@@ -37,11 +37,13 @@ func RunApp() error {
 	userRepository := repositories.NewUserRepository(db)
 	projectRepository := repositories.NewProjectRepository(db)
 	timeEntryRepository := repositories.NewTimeEntryRepository(db)
+	timeBoxEntryRepository := repositories.NewTimeBoxEntryRepository(db)
 
 	//services
 	authService := services.NewAuthService(userRepository)
 	projectService := services.NewProjectService(projectRepository)
 	timeEntryService := services.NewTimeEntryService(timeEntryRepository)
+	timeBoxEntryService := services.NewTimeBoxEntryService(timeBoxEntryRepository)	
 
 	firebaseService, err := services.NewFirebaseService()
 	if err != nil {
@@ -69,12 +71,13 @@ func RunApp() error {
 	authController := controllers.NewAuthController(authService)
 	projectController := controllers.NewProjectController(projectService)
 	timeEntryController := controllers.NewTimeEntryController(timeEntryService)
+	timeBoxEntryController := controllers.NewTimeBoxEntryController(timeBoxEntryService)
 
 	//routes
 	routes.SetupAuthRoutes(app, authController)
 	routes.SetupProjectRoutes(app, projectController)
 	routes.SetupTimeEntryRoutes(app, timeEntryController)
-
+	routes.SetupTimeBoxEntryRoutes(app, timeBoxEntryController)
 	app.Get("/hello", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, "hello from server", "hello sent successfully"))
 	})

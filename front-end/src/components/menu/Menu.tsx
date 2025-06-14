@@ -13,6 +13,7 @@ import Logo from "../../assets/logo/timer.svg";
 import LogoutIcon from "@mui/icons-material/Logout";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import TimerIcon from "@mui/icons-material/Timer";
 import FolderIcon from "@mui/icons-material/Folder";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import type { FC } from "react";
@@ -42,6 +43,11 @@ const Menu: FC = () => {
       name: "Time Entries",
       path: "/time-entries",
       icon: <AccessTimeIcon />,
+    },
+    {
+      name: "Time Boxing",
+      path: "/time-boxing",
+      icon: <TimerIcon />,
     },
     {
       name: "Projects",

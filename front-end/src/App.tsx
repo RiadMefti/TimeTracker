@@ -11,6 +11,7 @@ import MainLayout from "./components/layout/MainLayout";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import TimeEntriesPage from "./pages/TimeEntriesPage";
+import TimeBoxingPage from "./pages/TimeBoxingPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -43,6 +44,14 @@ const App: FC<AppProps> = ({ auth }) => {
           element={
             <MainLayout>
               <TimeEntriesPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/time-boxing"
+          element={
+            <MainLayout>
+              <TimeBoxingPage />
             </MainLayout>
           }
         />
