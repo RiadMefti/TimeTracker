@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import type { FC } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -25,6 +26,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
   Today as TodayIcon,
+  PlayArrow as PlayIcon,
 } from "@mui/icons-material";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -32,6 +34,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { type Dayjs } from "dayjs";
 import { useTimeBoxEntryStore } from "../stores/TimeBoxEntryStore";
 import { useProjectStore } from "../stores/ProjectStore";
+import { useTimeEntryStore } from "../stores/TimeEntryStore";
 import TimeBoxDialog from "../components/timebox/TimeBoxDialog";
 import type { TimeBoxEntry } from "../types/TimeBoxEntry";
 import type { Project } from "../types/Project";
@@ -42,6 +45,7 @@ interface TimeSlot {
 }
 
 const TimeBoxingPage: FC = () => {
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const [timeBoxDialogOpen, setTimeBoxDialogOpen] = useState(false);
   const [editingTimeBox, setEditingTimeBox] = useState<TimeBoxEntry | null>(
@@ -63,6 +67,7 @@ const TimeBoxingPage: FC = () => {
   const { timeBoxEntries, fetchTimeBoxEntries, deleteTimeBoxEntry } =
     useTimeBoxEntryStore();
   const { projects, fetchProjects } = useProjectStore();
+  const { createTimeEntry } = useTimeEntryStore();
 
   useEffect(() => {
     fetchTimeBoxEntries();
@@ -123,6 +128,23 @@ const TimeBoxingPage: FC = () => {
     setTimeBoxToDelete(timeBox);
     setDeleteConfirmOpen(true);
     handleCloseMenu();
+  };
+
+  const handleStartTrackingFromTimeBox = async (timeBox: TimeBoxEntry) => {
+    try {
+      await createTimeEntry({
+        Description: timeBox.Description,
+        ProjectID: timeBox.ProjectID,
+        StartDate: timeBox.StartDate,
+        EndDate: timeBox.EndDate,
+      });
+      handleCloseMenu();
+      // Navigate to time entries page to show the newly created entry
+      navigate("/time-entries");
+    } catch (error) {
+      console.error("Failed to create time entry from time box:", error);
+      // TODO: Add error notification
+    }
   };
 
   const confirmDeleteTimeBox = async () => {
@@ -817,6 +839,20 @@ const TimeBoxingPage: FC = () => {
             },
           }}
         >
+          <MenuItem
+            onClick={() =>
+              selectedTimeBox && handleStartTrackingFromTimeBox(selectedTimeBox)
+            }
+            sx={{
+              color: "#4caf50",
+              "&:hover": {
+                backgroundColor: "rgba(76, 175, 80, 0.1)",
+              },
+            }}
+          >
+            <PlayIcon sx={{ mr: 2, fontSize: 20 }} />
+            Start Tracking
+          </MenuItem>
           <MenuItem
             onClick={() =>
               selectedTimeBox && handleEditTimeBox(selectedTimeBox)

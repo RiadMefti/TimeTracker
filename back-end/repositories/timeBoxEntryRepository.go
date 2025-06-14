@@ -17,7 +17,7 @@ func NewTimeBoxEntryRepository(db *sql.DB) *TimeBoxEntryRepository {
 func (r *TimeBoxEntryRepository) GetUserTimeBoxEntries(userID string) ([]models.TimeBoxEntry, error) {
 	rows, err := r.db.Query(
 		`SELECT id, description, project_id, start_date, end_date 
-         FROM times WHERE user_id = $1`, userID)
+         FROM timeBoxes WHERE user_id = $1`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (r *TimeBoxEntryRepository) GetUserTimeBoxEntries(userID string) ([]models.
 
 func (r *TimeBoxEntryRepository) CreateTimeBoxEntry(entry models.TimeBoxEntryCreate, userID string) ([]models.TimeBoxEntry, error) {
 	_, err := r.db.Exec(
-		`INSERT INTO times (description, project_id, start_date, end_date, user_id)
+		`INSERT INTO timeBoxes (description, project_id, start_date, end_date, user_id)
          VALUES ($1, $2, $3, $4, $5)`,
 		entry.Description, entry.ProjectID, entry.StartDate, entry.EndDate, userID,
 	)
@@ -58,7 +58,7 @@ func (r *TimeBoxEntryRepository) CreateTimeBoxEntry(entry models.TimeBoxEntryCre
 
 func (r *TimeBoxEntryRepository) UpdateTimeBoxEntry(entry models.TimeBoxEntry, userID string) ([]models.TimeBoxEntry, error) {
 	_, err := r.db.Exec(
-		`UPDATE times SET description = $1, project_id = $2, start_date = $3, end_date = $4
+		`UPDATE timeBoxes SET description = $1, project_id = $2, start_date = $3, end_date = $4
          WHERE id = $5 AND user_id = $6`,
 		entry.Description, entry.ProjectID, entry.StartDate, entry.EndDate, entry.ID, userID,
 	)
@@ -70,7 +70,7 @@ func (r *TimeBoxEntryRepository) UpdateTimeBoxEntry(entry models.TimeBoxEntry, u
 
 func (r *TimeBoxEntryRepository) DeleteTimeBoxEntry(timeBoxEntryID int, userID string) ([]models.TimeBoxEntry, error) {
 	_, err := r.db.Exec(
-		`DELETE FROM times WHERE id = $1 AND user_id = $2`, timeBoxEntryID, userID,
+		`DELETE FROM timeBoxes WHERE id = $1 AND user_id = $2`, timeBoxEntryID, userID,
 	)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (r *TimeBoxEntryRepository) DeleteTimeBoxEntry(timeBoxEntryID int, userID s
 
 func (r *TimeBoxEntryRepository) AssignProjectToTimeBox(timeBoxEntryID int, projectID *int, userID string) ([]models.TimeBoxEntry, error) {
 	_, err := r.db.Exec(
-		`UPDATE times SET project_id = $1 WHERE id = $2 AND user_id = $3`, projectID, timeBoxEntryID, userID,
+		`UPDATE timeBoxes SET project_id = $1 WHERE id = $2 AND user_id = $3`, projectID, timeBoxEntryID, userID,
 	)
 	if err != nil {
 		return nil, err
