@@ -27,6 +27,7 @@ import {
   ChevronRight as ChevronRightIcon,
   Today as TodayIcon,
   PlayArrow as PlayIcon,
+  CheckCircle as CheckIcon,
 } from "@mui/icons-material";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -67,12 +68,13 @@ const TimeBoxingPage: FC = () => {
   const { timeBoxEntries, fetchTimeBoxEntries, deleteTimeBoxEntry } =
     useTimeBoxEntryStore();
   const { projects, fetchProjects } = useProjectStore();
-  const { createTimeEntry } = useTimeEntryStore();
+  const { timeEntries, fetchTimeEntries, createTimeEntry } = useTimeEntryStore();
 
   useEffect(() => {
     fetchTimeBoxEntries();
     fetchProjects();
-  }, [fetchTimeBoxEntries, fetchProjects]);
+    fetchTimeEntries();
+  }, [fetchTimeBoxEntries, fetchProjects, fetchTimeEntries]);
 
   const getProjectById = useCallback(
     (projectId: number | null): Project | null => {
@@ -80,6 +82,22 @@ const TimeBoxingPage: FC = () => {
       return projects.find((p) => p.ID === projectId) || null;
     },
     [projects]
+  );
+
+  // Check if a time box entry is already tracked
+  const isTimeBoxAlreadyTracked = useCallback(
+    (timeBox: TimeBoxEntry): boolean => {
+      return timeEntries.some((entry) => {
+        // Check if there's a time entry that matches the time box
+        return (
+          entry.Description === timeBox.Description &&
+          entry.ProjectID === timeBox.ProjectID &&
+          dayjs(entry.StartDate).isSame(dayjs(timeBox.StartDate), "minute") &&
+          dayjs(entry.EndDate).isSame(dayjs(timeBox.EndDate), "minute")
+        );
+      });
+    },
+    [timeEntries]
   );
 
   // Filter entries for selected date
@@ -132,6 +150,13 @@ const TimeBoxingPage: FC = () => {
 
   const handleStartTrackingFromTimeBox = async (timeBox: TimeBoxEntry) => {
     try {
+      // Double-check to prevent duplicate tracking
+      if (isTimeBoxAlreadyTracked(timeBox)) {
+        console.log("Time box is already tracked, skipping creation");
+        handleCloseMenu();
+        return;
+      }
+
       await createTimeEntry({
         Description: timeBox.Description,
         ProjectID: timeBox.ProjectID,
@@ -139,6 +164,10 @@ const TimeBoxingPage: FC = () => {
         EndDate: timeBox.EndDate,
       });
       handleCloseMenu();
+      
+      // Refresh time entries to update the UI
+      await fetchTimeEntries();
+      
       // Navigate to time entries page to show the newly created entry
       navigate("/time-entries");
     } catch (error) {
@@ -427,17 +456,27 @@ const TimeBoxingPage: FC = () => {
                                   mb: 0.5,
                                 }}
                               >
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    color: "#ffffff",
-                                    fontWeight: 600,
-                                    fontSize: "0.75rem",
-                                  }}
-                                >
-                                  {formatTime(entry.StartDate)} -{" "}
-                                  {formatTime(entry.EndDate)}
-                                </Typography>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      color: "#ffffff",
+                                      fontWeight: 600,
+                                      fontSize: "0.75rem",
+                                    }}
+                                  >
+                                    {formatTime(entry.StartDate)} -{" "}
+                                    {formatTime(entry.EndDate)}
+                                  </Typography>
+                                  {isTimeBoxAlreadyTracked(entry) && (
+                                    <CheckIcon
+                                      sx={{
+                                        fontSize: 12,
+                                        color: "#4caf50",
+                                      }}
+                                    />
+                                  )}
+                                </Box>
                                 <IconButton
                                   size="small"
                                   onClick={(e) => handleMenuClick(e, entry)}
@@ -839,20 +878,30 @@ const TimeBoxingPage: FC = () => {
             },
           }}
         >
-          <MenuItem
-            onClick={() =>
-              selectedTimeBox && handleStartTrackingFromTimeBox(selectedTimeBox)
-            }
-            sx={{
-              color: "#4caf50",
-              "&:hover": {
-                backgroundColor: "rgba(76, 175, 80, 0.1)",
-              },
-            }}
-          >
-            <PlayIcon sx={{ mr: 2, fontSize: 20 }} />
-            Start Tracking
-          </MenuItem>
+          {selectedTimeBox && (
+            <MenuItem
+              onClick={() => handleStartTrackingFromTimeBox(selectedTimeBox)}
+              disabled={isTimeBoxAlreadyTracked(selectedTimeBox)}
+              sx={{
+                color: isTimeBoxAlreadyTracked(selectedTimeBox) 
+                  ? "rgba(255, 255, 255, 0.3)" 
+                  : "#4caf50",
+                "&:hover": {
+                  backgroundColor: isTimeBoxAlreadyTracked(selectedTimeBox)
+                    ? "transparent"
+                    : "rgba(76, 175, 80, 0.1)",
+                },
+                "&.Mui-disabled": {
+                  color: "rgba(255, 255, 255, 0.3)",
+                },
+              }}
+            >
+              <PlayIcon sx={{ mr: 2, fontSize: 20 }} />
+              {isTimeBoxAlreadyTracked(selectedTimeBox) 
+                ? "Already Tracked" 
+                : "Start Tracking"}
+            </MenuItem>
+          )}
           <MenuItem
             onClick={() =>
               selectedTimeBox && handleEditTimeBox(selectedTimeBox)
