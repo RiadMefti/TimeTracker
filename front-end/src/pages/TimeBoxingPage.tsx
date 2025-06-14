@@ -539,37 +539,31 @@ const TimeBoxingPage: FC = () => {
               flex: 1,
               display: "flex",
               flexDirection: "column",
-              gap: 3,
+              gap: 1.5,
               minWidth: 320,
-              minHeight: 0,
-              overflow: "auto",
+              maxWidth: 380,
+              height: "100vh",
+              overflow: "hidden",
+              py: 1,
             }}
           >
-            {/* Date Navigation */}
+            {/* Date Navigation & Summary Combined */}
             <Paper
               sx={{
                 backgroundColor: "#1a2c38",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
                 borderRadius: 2,
-                p: 3,
+                p: 2,
+                flex: "0 0 auto",
               }}
             >
-              <Typography
-                variant="h6"
-                sx={{
-                  color: "#ffffff",
-                  mb: 2,
-                  fontWeight: 600,
-                }}
-              >
-                Date & Navigation
-              </Typography>
-
+              {/* Date Navigation */}
               <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}
               >
                 <IconButton
                   onClick={() => navigateDate("prev")}
+                  size="small"
                   sx={{
                     color: "rgba(255, 255, 255, 0.7)",
                     "&:hover": {
@@ -577,7 +571,7 @@ const TimeBoxingPage: FC = () => {
                     },
                   }}
                 >
-                  <ChevronLeftIcon />
+                  <ChevronLeftIcon fontSize="small" />
                 </IconButton>
 
                 <Button
@@ -588,17 +582,20 @@ const TimeBoxingPage: FC = () => {
                     textTransform: "none",
                     flex: 1,
                     justifyContent: "center",
+                    fontSize: "0.9rem",
+                    py: 0.5,
                     "&:hover": {
                       backgroundColor: "rgba(255, 255, 255, 0.05)",
                     },
                   }}
-                  startIcon={<CalendarIcon />}
+                  startIcon={<CalendarIcon fontSize="small" />}
                 >
                   {selectedDate.format("MMM D, YYYY")}
                 </Button>
 
                 <IconButton
                   onClick={() => navigateDate("next")}
+                  size="small"
                   sx={{
                     color: "rgba(255, 255, 255, 0.7)",
                     "&:hover": {
@@ -606,37 +603,60 @@ const TimeBoxingPage: FC = () => {
                     },
                   }}
                 >
-                  <ChevronRightIcon />
+                  <ChevronRightIcon fontSize="small" />
                 </IconButton>
               </Box>
 
-              {isToday && (
-                <Chip
-                  label="Today"
-                  size="small"
-                  sx={{
-                    backgroundColor: "rgba(10, 125, 255, 0.2)",
-                    color: "#0a7dff",
-                    mb: 2,
-                  }}
-                />
-              )}
+              {/* Today indicator and button */}
+              <Box sx={{ display: "flex", justifyContent: "center", mb: 1.5 }}>
+                {isToday ? (
+                  <Chip
+                    label="Today"
+                    size="small"
+                    sx={{
+                      backgroundColor: "rgba(10, 125, 255, 0.2)",
+                      color: "#0a7dff",
+                      height: 24,
+                      fontSize: "0.75rem",
+                    }}
+                  />
+                ) : (
+                  <Button
+                    onClick={goToToday}
+                    startIcon={<TodayIcon fontSize="small" />}
+                    size="small"
+                    sx={{
+                      color: "#0a7dff",
+                      fontSize: "0.75rem",
+                      "&:hover": {
+                        backgroundColor: "rgba(10, 125, 255, 0.1)",
+                      },
+                    }}
+                  >
+                    Go to Today
+                  </Button>
+                )}
+              </Box>
 
-              {!isToday && (
-                <Button
-                  onClick={goToToday}
-                  startIcon={<TodayIcon />}
-                  sx={{
-                    color: "#0a7dff",
-                    "&:hover": {
-                      backgroundColor: "rgba(10, 125, 255, 0.1)",
-                    },
-                    mb: 2,
-                  }}
-                >
-                  Go to Today
-                </Button>
-              )}
+              {/* Day Summary */}
+              <Box sx={{ display: "flex", justifyContent: "space-around", pt: 1, borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography variant="caption" sx={{ color: "rgba(255, 255, 255, 0.7)", display: "block" }}>
+                    Time Boxes
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: "#ffffff", fontWeight: 600, fontSize: "1.1rem" }}>
+                    {totalDayEntries}
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography variant="caption" sx={{ color: "rgba(255, 255, 255, 0.7)", display: "block" }}>
+                    Total Time
+                  </Typography>
+                  <Typography variant="h6" sx={{ color: "#0a7dff", fontWeight: 600, fontSize: "1.1rem" }}>
+                    {Math.floor(totalDayDuration / 60)}h {totalDayDuration % 60}m
+                  </Typography>
+                </Box>
+              </Box>
             </Paper>
 
             {/* Time Range */}
@@ -645,25 +665,20 @@ const TimeBoxingPage: FC = () => {
                 backgroundColor: "#1a2c38",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
                 borderRadius: 2,
-                p: 3,
+                p: 2,
+                flex: "0 0 auto",
               }}
             >
               <Typography
-                variant="h6"
+                variant="subtitle2"
                 sx={{
                   color: "#ffffff",
-                  mb: 2,
+                  mb: 1,
                   fontWeight: 600,
+                  fontSize: "0.9rem",
                 }}
               >
-                Time Range
-              </Typography>
-
-              <Typography
-                variant="body2"
-                sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 2 }}
-              >
-                {timeRange[0]}:00 - {timeRange[1]}:00
+                Time Range: {timeRange[0]}:00 - {timeRange[1]}:00
               </Typography>
 
               <Slider
@@ -676,16 +691,18 @@ const TimeBoxingPage: FC = () => {
                 min={0}
                 max={23}
                 marks={[
-                  { value: 0, label: "12 AM" },
-                  { value: 6, label: "6 AM" },
-                  { value: 12, label: "12 PM" },
-                  { value: 18, label: "6 PM" },
-                  { value: 23, label: "11 PM" },
+                  { value: 0, label: "0" },
+                  { value: 6, label: "6" },
+                  { value: 12, label: "12" },
+                  { value: 18, label: "18" },
+                  { value: 23, label: "23" },
                 ]}
                 sx={{
                   color: "#0a7dff",
                   "& .MuiSlider-thumb": {
                     backgroundColor: "#0a7dff",
+                    width: 16,
+                    height: 16,
                   },
                   "& .MuiSlider-track": {
                     backgroundColor: "#0a7dff",
@@ -695,117 +712,121 @@ const TimeBoxingPage: FC = () => {
                   },
                   "& .MuiSlider-mark": {
                     backgroundColor: "rgba(255, 255, 255, 0.3)",
+                    width: 2,
+                    height: 2,
                   },
                   "& .MuiSlider-markLabel": {
                     color: "rgba(255, 255, 255, 0.7)",
-                    fontSize: "0.7rem",
+                    fontSize: "0.65rem",
                   },
                 }}
               />
             </Paper>
 
-            {/* Day Summary */}
+            {/* Weekly Overview */}
             <Paper
               sx={{
                 backgroundColor: "#1a2c38",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
                 borderRadius: 2,
-                p: 3,
+                p: 2,
+                flex: "0 0 auto",
               }}
             >
               <Typography
-                variant="h6"
+                variant="subtitle2"
                 sx={{
                   color: "#ffffff",
-                  mb: 2,
+                  mb: 1.5,
                   fontWeight: 600,
+                  fontSize: "0.9rem",
                 }}
               >
-                Day Summary
+                This Week
               </Typography>
+              
+              <Box sx={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: 0.5,
+              }}>
+                {Array.from({ length: 7 }, (_, i) => {
+                  const date = selectedDate.startOf('week').add(i, 'day');
+                  const isToday = date.isSame(dayjs(), 'day');
+                  const isSelected = date.isSame(selectedDate, 'day');
+                  const dayEntries = timeBoxEntries.filter(entry => 
+                    dayjs(entry.StartDate).isSame(date, 'day')
+                  );
+                  const dayDuration = dayEntries.reduce((total, entry) => {
+                    return total + dayjs(entry.EndDate).diff(dayjs(entry.StartDate), 'minute');
+                  }, 0);
 
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "rgba(255, 255, 255, 0.7)" }}
-                  >
-                    Time Boxes
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "#ffffff", fontWeight: 600 }}
-                  >
-                    {totalDayEntries}
-                  </Typography>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "rgba(255, 255, 255, 0.7)" }}
-                  >
-                    Total Time
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "#0a7dff", fontWeight: 600 }}
-                  >
-                    {Math.floor(totalDayDuration / 60)}h {totalDayDuration % 60}
-                    m
-                  </Typography>
-                </Box>
+                  return (
+                    <Box
+                      key={i}
+                      onClick={() => setSelectedDate(date)}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        p: 1,
+                        borderRadius: 1,
+                        cursor: "pointer",
+                        backgroundColor: isSelected ? "rgba(10, 125, 255, 0.2)" : "transparent",
+                        border: isToday ? "1px solid #0a7dff" : "1px solid transparent",
+                        "&:hover": {
+                          backgroundColor: "rgba(255, 255, 255, 0.05)",
+                        },
+                      }}
+                    >
+                      <Box>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            color: isSelected ? "#0a7dff" : "#ffffff",
+                            fontWeight: isToday ? 600 : 400,
+                            fontSize: "0.8rem",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {date.format('ddd')}
+                        </Typography>
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            color: "rgba(255, 255, 255, 0.6)",
+                            fontSize: "0.7rem",
+                          }}
+                        >
+                          {date.format('MMM D')}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: "right" }}>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            color: "#0a7dff", 
+                            fontWeight: 500,
+                            fontSize: "0.8rem",
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {dayEntries.length}
+                        </Typography>
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            color: "rgba(255, 255, 255, 0.6)",
+                            fontSize: "0.7rem",
+                          }}
+                        >
+                          {Math.floor(dayDuration / 60)}h {dayDuration % 60}m
+                        </Typography>
+                      </Box>
+                    </Box>
+                  );
+                })}
               </Box>
-            </Paper>
-
-            {/* Actions */}
-            <Paper
-              sx={{
-                backgroundColor: "#1a2c38",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                borderRadius: 2,
-                p: 3,
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
-                  color: "#ffffff",
-                  mb: 2,
-                  fontWeight: 600,
-                }}
-              >
-                Quick Actions
-              </Typography>
-
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreateTimeBox}
-                fullWidth
-                sx={{
-                  backgroundColor: "#0a7dff",
-                  "&:hover": {
-                    backgroundColor: "#0862cc",
-                  },
-                  fontWeight: 600,
-                  py: 1.5,
-                }}
-              >
-                Create Time Box Entry
-              </Button>
             </Paper>
           </Box>
         </Box>
