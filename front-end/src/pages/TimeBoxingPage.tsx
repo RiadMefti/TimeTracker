@@ -68,7 +68,8 @@ const TimeBoxingPage: FC = () => {
   const { timeBoxEntries, fetchTimeBoxEntries, deleteTimeBoxEntry } =
     useTimeBoxEntryStore();
   const { projects, fetchProjects } = useProjectStore();
-  const { timeEntries, fetchTimeEntries, createTimeEntry } = useTimeEntryStore();
+  const { timeEntries, fetchTimeEntries, createTimeEntry } =
+    useTimeEntryStore();
 
   useEffect(() => {
     fetchTimeBoxEntries();
@@ -111,7 +112,7 @@ const TimeBoxingPage: FC = () => {
   const timeSlots: TimeSlot[] = useMemo(() => {
     const slots: TimeSlot[] = [];
 
-    // Create all hour slots first
+    // Create all hour slots first with hardcoded heights
     for (let hour = timeRange[0]; hour <= timeRange[1]; hour++) {
       slots.push({
         hour,
@@ -119,17 +120,9 @@ const TimeBoxingPage: FC = () => {
       });
     }
 
-    // Assign each entry to its starting hour slot only
-    dayEntries.forEach((entry) => {
-      const startHour = dayjs(entry.StartDate).hour();
-      const slot = slots.find((s) => s.hour === startHour);
-      if (slot) {
-        slot.entries.push(entry);
-      }
-    });
-
+    // No need to assign entries to slots anymore - we'll render them absolutely positioned
     return slots;
-  }, [dayEntries, timeRange]);
+  }, [timeRange]);
 
   const handleCreateTimeBox = () => {
     setEditingTimeBox(null);
@@ -164,10 +157,10 @@ const TimeBoxingPage: FC = () => {
         EndDate: timeBox.EndDate,
       });
       handleCloseMenu();
-      
+
       // Refresh time entries to update the UI
       await fetchTimeEntries();
-      
+
       // Navigate to time entries page to show the newly created entry
       navigate("/time-entries");
     } catch (error) {
@@ -226,38 +219,32 @@ const TimeBoxingPage: FC = () => {
 
   const formatTime = (dateString: string): string => {
     return dayjs(dateString).format("h:mm A");
-  };  const getTimeSlotPosition = (
-    entry: TimeBoxEntry,
-    slotHour: number
-  ): { top: number; height: number; isVisible: boolean } => {
-    const startTime = dayjs(entry.StartDate);
-    const endTime = dayjs(entry.EndDate);
-    const startHour = startTime.hour();
+  };
 
-    // Only show the entry in its starting hour slot
-    if (slotHour !== startHour) {
-      return { top: 0, height: 0, isVisible: false };
-    }
+  // Hardcoded hour height in pixels
+  const HOUR_HEIGHT = 60;
 
-    const startMinute = startTime.minute();
+  // Calculate pixels from date/time - this is the key function for precise positioning
+  const dateToPixels = (dateString: string, startHour: number): number => {
+    const date = dayjs(dateString);
+    const hour = date.hour();
+    const minute = date.minute();
 
-    // Calculate the total duration in minutes
-    const totalMinutes = endTime.diff(startTime, "minute");
+    // Calculate the total pixels from the start hour
+    const hourOffset = hour - startHour;
+    const minuteOffset = minute / 60; // Convert minutes to fractional hour
 
-    // Calculate top position within the starting hour slot (as percentage)
-    const top = (startMinute / 60) * 100;
+    return (hourOffset + minuteOffset) * HOUR_HEIGHT;
+  };
 
-    // Calculate height based on duration - spans multiple slots if needed
-    const heightInHours = totalMinutes / 60;
-    
-    // Height as percentage - each hour is 100%
-    const height = heightInHours * 100;
+  // Calculate height in pixels from duration
+  const durationToPixels = (startDate: string, endDate: string): number => {
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
+    const durationInMinutes = end.diff(start, "minute");
+    const durationInHours = durationInMinutes / 60;
 
-    return {
-      top: top,
-      height: height,
-      isVisible: true,
-    };
+    return durationInHours * HOUR_HEIGHT;
   };
 
   const isToday = selectedDate.isSame(dayjs(), "day");
@@ -267,10 +254,6 @@ const TimeBoxingPage: FC = () => {
     const end = dayjs(entry.EndDate);
     return total + end.diff(start, "minute");
   }, 0);
-
-  // Calculate dynamic slot height based on time range
-  const totalHours = timeRange[1] - timeRange[0] + 1;
-  const slotHeight = Math.max(40, Math.min(120, 600 / totalHours));
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -357,152 +340,361 @@ const TimeBoxingPage: FC = () => {
                 flexDirection: "column",
               }}
             >
-              {/* Always show time grid, even when empty */}
+              {/* Time Grid with hardcoded heights */}
               <Box
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
+                  position: "relative",
+                  backgroundColor: "#1a2c38",
                 }}
               >
-                {timeSlots.map((slot) => (
+                {/* Hour grid lines and labels */}
+                {timeSlots.map((slot, index) => (
+                  <Box
+                    key={slot.hour}
+                    sx={{
+                      position: "absolute",
+                      top: `${index * HOUR_HEIGHT}px`,
+                      left: 0,
+                      right: 0,
+                      height: `${HOUR_HEIGHT}px`,
+                      display: "flex",
+                      borderBottom:
+                        index === timeSlots.length - 1
+                          ? "none"
+                          : "1px solid rgba(255, 255, 255, 0.1)",
+                    }}
+                  >
+                    {/* Hour Label */}
                     <Box
-                      key={slot.hour}
                       sx={{
+                        width: 80,
+                        height: `${HOUR_HEIGHT}px`,
+                        borderRight: "1px solid rgba(255, 255, 255, 0.1)",
                         display: "flex",
-                        borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-                        minHeight: slotHeight,
-                        height: slotHeight,
-                        "&:last-child": {
-                          borderBottom: "none",
-                        },
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "rgba(255, 255, 255, 0.02)",
+                        flexShrink: 0,
                       }}
                     >
-                      {/* Hour Label */}
-                      <Box
+                      <Typography
+                        variant="body2"
                         sx={{
-                          width: 100,
-                          p: 2,
-                          borderRight: "1px solid rgba(255, 255, 255, 0.1)",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          backgroundColor: "rgba(255, 255, 255, 0.02)",
-                          flexShrink: 0,
+                          color: "rgba(255, 255, 255, 0.7)",
+                          fontWeight: 500,
+                          fontSize: "0.75rem",
                         }}
                       >
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: "rgba(255, 255, 255, 0.7)",
-                            fontWeight: 500,
-                          }}
-                        >
-                          {slot.hour === 0
-                            ? "12 AM"
-                            : slot.hour < 12
-                            ? `${slot.hour} AM`
-                            : slot.hour === 12
-                            ? "12 PM"
-                            : `${slot.hour - 12} PM`}
-                        </Typography>
-                      </Box>
+                        {slot.hour === 0
+                          ? "12 AM"
+                          : slot.hour < 12
+                          ? `${slot.hour} AM`
+                          : slot.hour === 12
+                          ? "12 PM"
+                          : `${slot.hour - 12} PM`}
+                      </Typography>
+                    </Box>
 
-                      {/* Time Slot Content */}
+                    {/* Time Slot Background */}
+                    <Box
+                      sx={{
+                        flex: 1,
+                        height: `${HOUR_HEIGHT}px`,
+                      }}
+                    />
+                  </Box>
+                ))}
+
+                {/* Absolutely positioned time box entries */}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 80, // Offset by hour label width
+                    right: 0,
+                    height: `${timeSlots.length * HOUR_HEIGHT}px`,
+                    pointerEvents: "none", // Allow clicking through to hour slots
+                  }}
+                >
+                  {dayEntries.map((entry) => {
+                    const project = getProjectById(entry.ProjectID);
+                    const startPixels = dateToPixels(
+                      entry.StartDate,
+                      timeRange[0]
+                    );
+                    const heightPixels = durationToPixels(
+                      entry.StartDate,
+                      entry.EndDate
+                    );
+
+                    // Determine layout based on available height
+                    const isCompact = heightPixels < 50;
+                    const isVeryCompact = heightPixels < 30;
+
+                    return (
                       <Box
+                        key={entry.ID}
                         sx={{
-                          flex: 1,
-                          position: "relative",
-                          minHeight: slotHeight,
-                          height: slotHeight,
+                          position: "absolute",
+                          top: `${startPixels}px`,
+                          height: `${heightPixels}px`,
+                          left: 4,
+                          right: 4,
+                          backgroundColor: project?.Color || "#0a7dff",
+                          borderRadius: 1,
+                          cursor: "pointer",
+                          transition: "all 0.2s ease-in-out",
+                          zIndex: 10,
+                          pointerEvents: "auto",
+                          overflow: "hidden",
+                          "&:hover": {
+                            transform: "scale(1.02)",
+                            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+                            zIndex: 20,
+                          },
+                          minHeight: 20,
+                          border: isVeryCompact
+                            ? "1px solid rgba(255, 255, 255, 0.3)"
+                            : "none",
                         }}
                       >
-                        {slot.entries.map((entry) => {
-                          const project = getProjectById(entry.ProjectID);
-                          const position = getTimeSlotPosition(
-                            entry,
-                            slot.hour
-                          );
-
-                          if (!position.isVisible) return null;
-
-                          return (
+                        {isVeryCompact ? (
+                          // Very compact layout - single line with ALL essential info
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              px: 0.5,
+                              py: 0.25,
+                              gap: 0.5,
+                            }}
+                          >
                             <Box
-                              key={entry.ID}
                               sx={{
-                                position: "absolute",
-                                top: `${position.top}%`,
-                                height: `${position.height}%`,
-                                left: 8,
-                                right: 8,
-                                backgroundColor: project?.Color || "#0a7dff",
-                                borderRadius: 1,
-                                p: 1,
-                                cursor: "pointer",
-                                transition: "all 0.2s ease-in-out",
-                                zIndex: 10,
-                                "&:hover": {
-                                  transform: "scale(1.02)",
-                                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
-                                  zIndex: 20,
-                                },
-                                minHeight: 40,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 0.5,
+                                flex: 1,
+                                minWidth: 0,
                                 overflow: "hidden",
                               }}
                             >
-                              <Box
+                              <Typography
+                                variant="body2"
                                 sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "space-between",
-                                  mb: 0.5,
+                                  color: "#ffffff",
+                                  fontWeight: 600,
+                                  fontSize: "0.55rem",
+                                  whiteSpace: "nowrap",
+                                  flexShrink: 0,
                                 }}
                               >
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      color: "#ffffff",
-                                      fontWeight: 600,
-                                      fontSize: "0.75rem",
-                                    }}
-                                  >
-                                    {formatTime(entry.StartDate)} -{" "}
-                                    {formatTime(entry.EndDate)}
-                                  </Typography>
-                                  {isTimeBoxAlreadyTracked(entry) && (
-                                    <CheckIcon
-                                      sx={{
-                                        fontSize: 12,
-                                        color: "#4caf50",
-                                      }}
-                                    />
-                                  )}
-                                </Box>
-                                <IconButton
-                                  size="small"
-                                  onClick={(e) => handleMenuClick(e, entry)}
-                                  sx={{
-                                    color: "rgba(255, 255, 255, 0.8)",
-                                    p: 0.25,
-                                    "&:hover": {
-                                      backgroundColor:
-                                        "rgba(255, 255, 255, 0.1)",
-                                    },
-                                  }}
-                                >
-                                  <MoreIcon fontSize="small" />
-                                </IconButton>
-                              </Box>
+                                {formatTime(entry.StartDate)}
+                              </Typography>
                               <Typography
                                 variant="body2"
                                 sx={{
                                   color: "rgba(255, 255, 255, 0.9)",
-                                  fontSize: "0.75rem",
-                                  lineHeight: 1.2,
+                                  fontSize: "0.55rem",
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
-                                  display: "-webkit-box",
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: "vertical",
+                                  whiteSpace: "nowrap",
+                                  flex: 1,
+                                  minWidth: 0,
+                                }}
+                              >
+                                {entry.Description}
+                              </Typography>
+                              {project && (
+                                <Box
+                                  sx={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: "50%",
+                                    backgroundColor: "rgba(255, 255, 255, 0.6)",
+                                    flexShrink: 0,
+                                  }}
+                                  title={project.Name}
+                                />
+                              )}
+                              {isTimeBoxAlreadyTracked(entry) && (
+                                <CheckIcon
+                                  sx={{
+                                    fontSize: 8,
+                                    color: "#4caf50",
+                                    flexShrink: 0,
+                                  }}
+                                />
+                              )}
+                            </Box>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleMenuClick(e, entry)}
+                              sx={{
+                                color: "rgba(255, 255, 255, 0.8)",
+                                p: 0.25,
+                                minWidth: "auto",
+                                width: 14,
+                                height: 14,
+                                flexShrink: 0,
+                                "&:hover": {
+                                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                },
+                              }}
+                            >
+                              <MoreIcon sx={{ fontSize: 10 }} />
+                            </IconButton>
+                          </Box>
+                        ) : isCompact ? (
+                          // Compact layout - single line with more info
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              px: 0.75,
+                              py: 0.5,
+                              gap: 0.75,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 0.75,
+                                flex: 1,
+                                minWidth: 0,
+                                overflow: "hidden",
+                              }}
+                            >
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "#ffffff",
+                                  fontWeight: 600,
+                                  fontSize: "0.65rem",
+                                  whiteSpace: "nowrap",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {formatTime(entry.StartDate)}-{formatTime(entry.EndDate)}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "rgba(255, 255, 255, 0.9)",
+                                  fontSize: "0.65rem",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                  flex: 1,
+                                  minWidth: 0,
+                                }}
+                              >
+                                {entry.Description}
+                              </Typography>
+                              {project && (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.25,
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      width: 8,
+                                      height: 8,
+                                      borderRadius: "50%",
+                                      backgroundColor: "rgba(255, 255, 255, 0.6)",
+                                    }}
+                                  />
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      color: "rgba(255, 255, 255, 0.7)",
+                                      fontSize: "0.6rem",
+                                      whiteSpace: "nowrap",
+                                    }}
+                                  >
+                                    {project.Name}
+                                  </Typography>
+                                </Box>
+                              )}
+                              {isTimeBoxAlreadyTracked(entry) && (
+                                <CheckIcon
+                                  sx={{
+                                    fontSize: 10,
+                                    color: "#4caf50",
+                                    flexShrink: 0,
+                                  }}
+                                />
+                              )}
+                            </Box>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleMenuClick(e, entry)}
+                              sx={{
+                                color: "rgba(255, 255, 255, 0.8)",
+                                p: 0.25,
+                                minWidth: "auto",
+                                width: 18,
+                                height: 18,
+                                flexShrink: 0,
+                                "&:hover": {
+                                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                },
+                              }}
+                            >
+                              <MoreIcon sx={{ fontSize: 12 }} />
+                            </IconButton>
+                          </Box>
+                        ) : (
+                          // Normal layout - single line with full info
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              px: 1,
+                              py: 0.5,
+                              gap: 1,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                                flex: 1,
+                                minWidth: 0,
+                                overflow: "hidden",
+                              }}
+                            >
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "#ffffff",
+                                  fontWeight: 600,
+                                  fontSize: "0.7rem",
+                                  whiteSpace: "nowrap",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {formatTime(entry.StartDate)} - {formatTime(entry.EndDate)}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "rgba(255, 255, 255, 0.9)",
+                                  fontSize: "0.7rem",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                  flex: 1,
+                                  minWidth: 0,
                                 }}
                               >
                                 {entry.Description}
@@ -512,24 +704,51 @@ const TimeBoxingPage: FC = () => {
                                   label={project.Name}
                                   size="small"
                                   sx={{
-                                    mt: 0.5,
                                     height: 16,
                                     fontSize: "0.6rem",
                                     backgroundColor: "rgba(255, 255, 255, 0.2)",
                                     color: "#ffffff",
+                                    flexShrink: 0,
                                     "& .MuiChip-label": {
                                       px: 0.5,
                                     },
                                   }}
                                 />
                               )}
+                              {isTimeBoxAlreadyTracked(entry) && (
+                                <CheckIcon
+                                  sx={{
+                                    fontSize: 12,
+                                    color: "#4caf50",
+                                    flexShrink: 0,
+                                  }}
+                                />
+                              )}
                             </Box>
-                          );
-                        })}
+                            <IconButton
+                              size="small"
+                              onClick={(e) => handleMenuClick(e, entry)}
+                              sx={{
+                                color: "rgba(255, 255, 255, 0.8)",
+                                p: 0.25,
+                                flexShrink: 0,
+                                "&:hover": {
+                                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                },
+                              }}
+                            >
+                              <MoreIcon fontSize="small" />
+                            </IconButton>
+                          </Box>
+                        )}
                       </Box>
-                    </Box>
-                  ))}
+                    );
+                  })}
                 </Box>
+
+                {/* Container height */}
+                <Box sx={{ height: `${timeSlots.length * HOUR_HEIGHT}px` }} />
+              </Box>
             </Paper>
           </Box>
 
@@ -639,21 +858,49 @@ const TimeBoxingPage: FC = () => {
               </Box>
 
               {/* Day Summary */}
-              <Box sx={{ display: "flex", justifyContent: "space-around", pt: 1, borderTop: "1px solid rgba(255, 255, 255, 0.1)" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-around",
+                  pt: 1,
+                  borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+                }}
+              >
                 <Box sx={{ textAlign: "center" }}>
-                  <Typography variant="caption" sx={{ color: "rgba(255, 255, 255, 0.7)", display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "rgba(255, 255, 255, 0.7)", display: "block" }}
+                  >
                     Time Boxes
                   </Typography>
-                  <Typography variant="h6" sx={{ color: "#ffffff", fontWeight: 600, fontSize: "1.1rem" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "#ffffff",
+                      fontWeight: 600,
+                      fontSize: "1.1rem",
+                    }}
+                  >
                     {totalDayEntries}
                   </Typography>
                 </Box>
                 <Box sx={{ textAlign: "center" }}>
-                  <Typography variant="caption" sx={{ color: "rgba(255, 255, 255, 0.7)", display: "block" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "rgba(255, 255, 255, 0.7)", display: "block" }}
+                  >
                     Total Time
                   </Typography>
-                  <Typography variant="h6" sx={{ color: "#0a7dff", fontWeight: 600, fontSize: "1.1rem" }}>
-                    {Math.floor(totalDayDuration / 60)}h {totalDayDuration % 60}m
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "#0a7dff",
+                      fontWeight: 600,
+                      fontSize: "1.1rem",
+                    }}
+                  >
+                    {Math.floor(totalDayDuration / 60)}h {totalDayDuration % 60}
+                    m
                   </Typography>
                 </Box>
               </Box>
@@ -744,21 +991,29 @@ const TimeBoxingPage: FC = () => {
               >
                 This Week
               </Typography>
-              
-              <Box sx={{ 
-                display: "flex", 
-                flexDirection: "column", 
-                gap: 0.5,
-              }}>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0.5,
+                }}
+              >
                 {Array.from({ length: 7 }, (_, i) => {
-                  const date = selectedDate.startOf('week').add(i, 'day');
-                  const isToday = date.isSame(dayjs(), 'day');
-                  const isSelected = date.isSame(selectedDate, 'day');
-                  const dayEntries = timeBoxEntries.filter(entry => 
-                    dayjs(entry.StartDate).isSame(date, 'day')
+                  const date = selectedDate.startOf("week").add(i, "day");
+                  const isToday = date.isSame(dayjs(), "day");
+                  const isSelected = date.isSame(selectedDate, "day");
+                  const dayEntries = timeBoxEntries.filter((entry) =>
+                    dayjs(entry.StartDate).isSame(date, "day")
                   );
                   const dayDuration = dayEntries.reduce((total, entry) => {
-                    return total + dayjs(entry.EndDate).diff(dayjs(entry.StartDate), 'minute');
+                    return (
+                      total +
+                      dayjs(entry.EndDate).diff(
+                        dayjs(entry.StartDate),
+                        "minute"
+                      )
+                    );
                   }, 0);
 
                   return (
@@ -772,40 +1027,44 @@ const TimeBoxingPage: FC = () => {
                         p: 1,
                         borderRadius: 1,
                         cursor: "pointer",
-                        backgroundColor: isSelected ? "rgba(10, 125, 255, 0.2)" : "transparent",
-                        border: isToday ? "1px solid #0a7dff" : "1px solid transparent",
+                        backgroundColor: isSelected
+                          ? "rgba(10, 125, 255, 0.2)"
+                          : "transparent",
+                        border: isToday
+                          ? "1px solid #0a7dff"
+                          : "1px solid transparent",
                         "&:hover": {
                           backgroundColor: "rgba(255, 255, 255, 0.05)",
                         },
                       }}
                     >
                       <Box>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
+                        <Typography
+                          variant="body2"
+                          sx={{
                             color: isSelected ? "#0a7dff" : "#ffffff",
                             fontWeight: isToday ? 600 : 400,
                             fontSize: "0.8rem",
                             lineHeight: 1.2,
                           }}
                         >
-                          {date.format('ddd')}
+                          {date.format("ddd")}
                         </Typography>
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
+                        <Typography
+                          variant="caption"
+                          sx={{
                             color: "rgba(255, 255, 255, 0.6)",
                             fontSize: "0.7rem",
                           }}
                         >
-                          {date.format('MMM D')}
+                          {date.format("MMM D")}
                         </Typography>
                       </Box>
                       <Box sx={{ textAlign: "right" }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            color: "#0a7dff", 
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#0a7dff",
                             fontWeight: 500,
                             fontSize: "0.8rem",
                             lineHeight: 1.2,
@@ -813,9 +1072,9 @@ const TimeBoxingPage: FC = () => {
                         >
                           {dayEntries.length}
                         </Typography>
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
+                        <Typography
+                          variant="caption"
+                          sx={{
                             color: "rgba(255, 255, 255, 0.6)",
                             fontSize: "0.7rem",
                           }}
@@ -904,8 +1163,8 @@ const TimeBoxingPage: FC = () => {
               onClick={() => handleStartTrackingFromTimeBox(selectedTimeBox)}
               disabled={isTimeBoxAlreadyTracked(selectedTimeBox)}
               sx={{
-                color: isTimeBoxAlreadyTracked(selectedTimeBox) 
-                  ? "rgba(255, 255, 255, 0.3)" 
+                color: isTimeBoxAlreadyTracked(selectedTimeBox)
+                  ? "rgba(255, 255, 255, 0.3)"
                   : "#4caf50",
                 "&:hover": {
                   backgroundColor: isTimeBoxAlreadyTracked(selectedTimeBox)
@@ -918,8 +1177,8 @@ const TimeBoxingPage: FC = () => {
               }}
             >
               <PlayIcon sx={{ mr: 2, fontSize: 20 }} />
-              {isTimeBoxAlreadyTracked(selectedTimeBox) 
-                ? "Already Tracked" 
+              {isTimeBoxAlreadyTracked(selectedTimeBox)
+                ? "Already Tracked"
                 : "Start Tracking"}
             </MenuItem>
           )}
