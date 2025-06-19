@@ -14,8 +14,9 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import TimerIcon from "@mui/icons-material/Timer";
-import FolderIcon from "@mui/icons-material/Folder";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import WorkIcon from "@mui/icons-material/Work";
+import DescriptionIcon from "@mui/icons-material/Description";
+import PersonIcon from "@mui/icons-material/Person";
 import type { FC } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
@@ -26,6 +27,7 @@ interface MenuItem {
   name: string;
   path: string;
   icon: React.ReactNode;
+  color?: string;
 }
 
 const Menu: FC = () => {
@@ -38,26 +40,37 @@ const Menu: FC = () => {
       name: "Dashboard",
       path: "/dashboard",
       icon: <DashboardIcon />,
+      color: "#4CAF50", // Green
     },
     {
       name: "Time Entries",
       path: "/time-entries",
       icon: <AccessTimeIcon />,
+      color: "#FF9800", // Orange
     },
     {
       name: "Time Boxing",
       path: "/time-boxing",
       icon: <TimerIcon />,
+      color: "#E91E63", // Pink
     },
     {
       name: "Projects",
       path: "/projects",
-      icon: <FolderIcon />,
+      icon: <WorkIcon />,
+      color: "#9C27B0", // Purple
+    },
+    {
+      name: "Documents",
+      path: "/documents",
+      icon: <DescriptionIcon />,
+      color: "#2196F3", // Blue (different from the theme blue)
     },
     {
       name: "Profile",
       path: "/profile",
-      icon: <AccountCircleIcon />,
+      icon: <PersonIcon />,
+      color: "#607D8B", // Blue Grey
     },
   ];
 
@@ -151,7 +164,7 @@ const Menu: FC = () => {
               <ListItemIcon
                 sx={{
                   minWidth: 40,
-                  color: isActive(item.path) ? "#0a7dff" : "inherit",
+                  color: isActive(item.path) ? "#0a7dff" : (item.color || "inherit"),
                 }}
               >
                 {item.icon}

@@ -43,6 +43,7 @@ func AuthorizationMiddleware(firebaseService *firebase.App) fiber.Handler {
 		}
 
 		c.Locals("user", user)
+		c.Locals("userID", uidToken.UID)
 		return c.Next()
 	}
 }

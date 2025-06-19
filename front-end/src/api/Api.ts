@@ -3,6 +3,8 @@ import { AuthApi } from "./AuthApi";
 import { ProjectApi } from "./ProjectApi";
 import { TimeBoxEntryApi } from "./TimeBoxEntryApi";
 import { TimeEntryApi } from "./TimeEntryApi";
+import { FolderApi } from "./FolderApi";
+import { NoteApi } from "./NoteApi";
 
 export class Api {
   private static _client: ApiClient;
@@ -10,6 +12,8 @@ export class Api {
   private static _projectApi: ProjectApi;
   private static _timeEntryApi: TimeEntryApi;
   private static _timeBoxEntryApi: TimeBoxEntryApi;
+  private static _folderApi: FolderApi;
+  private static _noteApi: NoteApi;
 
   static initApiClasses() {
     if (!Api._client) {
@@ -19,6 +23,8 @@ export class Api {
     Api._projectApi = new ProjectApi(Api._client);
     Api._timeEntryApi = new TimeEntryApi(Api._client);
     Api._timeBoxEntryApi = new TimeBoxEntryApi(Api._client);
+    Api._folderApi = new FolderApi(Api._client);
+    Api._noteApi = new NoteApi(Api._client);
   }
   static set authToken(token: string | undefined) {
     if (!token) {
@@ -62,5 +68,19 @@ export class Api {
       throw new Error("TimeBoxEntryApi not initialized.");
     }
     return Api._timeBoxEntryApi;
+  }
+
+  public static get folders() {
+    if (!Api._folderApi) {
+      throw new Error("FolderApi not initialized.");
+    }
+    return Api._folderApi;
+  }
+
+  public static get notes() {
+    if (!Api._noteApi) {
+      throw new Error("NoteApi not initialized.");
+    }
+    return Api._noteApi;
   }
 }

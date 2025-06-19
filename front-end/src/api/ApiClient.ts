@@ -63,8 +63,7 @@ export class ApiClient {
       if (
         typeof resBody === "object" &&
         resBody !== null &&
-        "Success" in resBody &&
-        "Message" in resBody
+        "Success" in resBody
       ) {
         return resBody as ApiResponse<T>;
       }

@@ -38,12 +38,16 @@ func RunApp() error {
 	projectRepository := repositories.NewProjectRepository(db)
 	timeEntryRepository := repositories.NewTimeEntryRepository(db)
 	timeBoxEntryRepository := repositories.NewTimeBoxEntryRepository(db)
+	folderRepository := repositories.NewFolderRepository(db)
+	noteRepository := repositories.NewNoteRepository(db)
 
 	//services
 	authService := services.NewAuthService(userRepository)
 	projectService := services.NewProjectService(projectRepository)
 	timeEntryService := services.NewTimeEntryService(timeEntryRepository)
-	timeBoxEntryService := services.NewTimeBoxEntryService(timeBoxEntryRepository)	
+	timeBoxEntryService := services.NewTimeBoxEntryService(timeBoxEntryRepository)
+	folderService := services.NewFolderService(folderRepository)
+	noteService := services.NewNoteService(noteRepository)	
 
 	firebaseService, err := services.NewFirebaseService()
 	if err != nil {
@@ -72,12 +76,16 @@ func RunApp() error {
 	projectController := controllers.NewProjectController(projectService)
 	timeEntryController := controllers.NewTimeEntryController(timeEntryService)
 	timeBoxEntryController := controllers.NewTimeBoxEntryController(timeBoxEntryService)
+	folderController := controllers.NewFolderController(folderService)
+	noteController := controllers.NewNoteController(noteService)
 
 	//routes
 	routes.SetupAuthRoutes(app, authController)
 	routes.SetupProjectRoutes(app, projectController)
 	routes.SetupTimeEntryRoutes(app, timeEntryController)
 	routes.SetupTimeBoxEntryRoutes(app, timeBoxEntryController)
+	routes.SetupFolderRoutes(app, folderController)
+	routes.SetupNoteRoutes(app, noteController)
 	app.Get("/hello", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(utils.CreateApiResponse(true, "hello from server", "hello sent successfully"))
 	})
