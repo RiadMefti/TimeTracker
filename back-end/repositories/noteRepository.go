@@ -74,7 +74,7 @@ func (r *NoteRepository) GetAllByUser(userID string) ([]*models.Note, error) {
 	}
 	defer rows.Close()
 	
-	var notes []*models.Note
+	notes := make([]*models.Note, 0) // Initialize as empty slice instead of nil
 	
 	for rows.Next() {
 		var note models.Note
@@ -124,7 +124,7 @@ func (r *NoteRepository) GetByFolder(folderID *int, userID string) ([]*models.No
 	}
 	defer rows.Close()
 	
-	var notes []*models.Note
+	notes := make([]*models.Note, 0) // Initialize as empty slice instead of nil
 	
 	for rows.Next() {
 		var note models.Note

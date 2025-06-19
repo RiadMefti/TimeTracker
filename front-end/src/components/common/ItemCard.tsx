@@ -44,12 +44,14 @@ const ItemCard: FC<ItemCardProps> = ({
     setAnchorEl(null);
   };
 
-  const handleEdit = () => {
+  const handleEdit = (event: React.MouseEvent) => {
+    event.stopPropagation();
     onEdit(item);
     handleMenuClose();
   };
 
-  const handleDelete = () => {
+  const handleDelete = (event: React.MouseEvent) => {
+    event.stopPropagation();
     onDelete(item);
     handleMenuClose();
   };

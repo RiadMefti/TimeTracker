@@ -74,7 +74,7 @@ func (r *FolderRepository) GetAllByUser(userID string) ([]*models.Folder, error)
 	}
 	defer rows.Close()
 	
-	var folders []*models.Folder
+	folders := make([]*models.Folder, 0) // Initialize as empty slice instead of nil
 	
 	for rows.Next() {
 		var folder models.Folder
@@ -124,7 +124,7 @@ func (r *FolderRepository) GetByParent(parentID *int, userID string) ([]*models.
 	}
 	defer rows.Close()
 	
-	var folders []*models.Folder
+	folders := make([]*models.Folder, 0) // Initialize as empty slice instead of nil
 	
 	for rows.Next() {
 		var folder models.Folder

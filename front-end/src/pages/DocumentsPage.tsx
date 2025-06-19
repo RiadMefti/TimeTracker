@@ -29,8 +29,8 @@ const DocumentsPage: FC = () => {
     setCurrentFolderId,
     getFolderById,
     getFolderPath,
-    removeFolder,
     fetchFolders,
+    deleteFolder,
     loading: foldersLoading,
     error: foldersError,
   } = useFolderStore();
@@ -39,8 +39,8 @@ const DocumentsPage: FC = () => {
     notes,
     currentNote, 
     setCurrentNote, 
-    removeNote,
     fetchNotes,
+    deleteNote,
     loading: notesLoading,
     error: notesError,
   } = useNoteStore();
@@ -78,16 +78,74 @@ const DocumentsPage: FC = () => {
   );
   const breadcrumbPath = currentFolderId ? getFolderPath(currentFolderId) : [];
 
+  const handleConfirmDelete = async () => {
+    if (itemToDelete) {
+      if (itemToDelete.type === "folder") {
+        await deleteFolder((itemToDelete.item as Folder).ID);
+      } else {
+        const noteToDelete = itemToDelete.item as Note;
+        await deleteNote(noteToDelete.ID);
+        // If we're deleting the currently viewed note, go back to list
+        const currentNoteTyped = currentNote as Note | null;
+        if (currentNoteTyped && currentNoteTyped.ID === noteToDelete.ID) {
+          setCurrentNote(null);
+        }
+      }
+    }
+    setDeleteConfirmOpen(false);
+    setItemToDelete(null);
+  };
+
   // If viewing a document, show the document viewer
   if (currentNote) {
     return (
-      <DocumentViewer
-        onBack={() => setCurrentNote(null)}
-        onDelete={(note) => {
-          setItemToDelete({ type: "note", item: note });
-          setDeleteConfirmOpen(true);
-        }}
-      />
+      <>
+        <DocumentViewer
+          onBack={() => setCurrentNote(null)}
+          onDelete={(note) => {
+            setItemToDelete({ type: "note", item: note });
+            setDeleteConfirmOpen(true);
+          }}
+        />
+        
+        {/* Delete Confirmation Dialog - needs to be rendered even when viewing a document */}
+        <Dialog
+          open={deleteConfirmOpen}
+          onClose={() => setDeleteConfirmOpen(false)}
+          PaperProps={{
+            sx: {
+              backgroundColor: '#1a2c38',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+            },
+          }}
+        >
+          <DialogTitle sx={{ color: 'white' }}>
+            Confirm Delete
+          </DialogTitle>
+          <DialogContent>
+            <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+              Are you sure you want to delete this{' '}
+              {itemToDelete?.type === 'folder' ? 'folder' : 'document'}?
+              {itemToDelete?.type === 'folder' && ' This will also delete all contents inside it.'}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setDeleteConfirmOpen(false)}
+              sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              sx={{ color: '#f44336' }}
+              variant="contained"
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     );
   }
 
@@ -163,24 +221,6 @@ const DocumentsPage: FC = () => {
     } else {
       handleNoteClick(item as Note);
     }
-  };
-
-  const handleConfirmDelete = () => {
-    if (itemToDelete) {
-      if (itemToDelete.type === "folder") {
-        removeFolder((itemToDelete.item as Folder).ID);
-      } else {
-        const noteToDelete = itemToDelete.item as Note;
-        removeNote(noteToDelete.ID);
-        // If we're deleting the currently viewed note, go back to list
-        const currentNoteTyped = currentNote as Note | null;
-        if (currentNoteTyped && currentNoteTyped.ID === noteToDelete.ID) {
-          setCurrentNote(null);
-        }
-      }
-    }
-    setDeleteConfirmOpen(false);
-    setItemToDelete(null);
   };
 
   const allItems = [
@@ -406,12 +446,22 @@ const DocumentsPage: FC = () => {
           sx: {
             backgroundColor: "#1a2c38",
             backgroundImage: "none",
+            border: "1px solid rgba(255, 255, 255, 0.12)",
+            borderRadius: 2,
           },
         }}
       >
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <Typography>
+        <DialogTitle 
+          sx={{ 
+            color: "white", 
+            borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+            pb: 2
+          }}
+        >
+          Confirm Delete
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Typography sx={{ color: "rgba(255, 255, 255, 0.87)" }}>
             Are you sure you want to delete this{" "}
             {itemToDelete?.type === "folder" ? "folder" : "document"}? This
             action cannot be undone.
@@ -419,14 +469,29 @@ const DocumentsPage: FC = () => {
               " All documents and subfolders within this folder will also be deleted."}
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteConfirmOpen(false)} color="inherit">
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button 
+            onClick={() => setDeleteConfirmOpen(false)} 
+            color="inherit"
+            sx={{ 
+              color: "rgba(255, 255, 255, 0.7)",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.08)",
+              },
+            }}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleConfirmDelete}
             color="error"
             variant="contained"
+            sx={{
+              backgroundColor: "#d32f2f",
+              "&:hover": {
+                backgroundColor: "#b71c1c",
+              },
+            }}
           >
             Delete
           </Button>

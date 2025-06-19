@@ -68,6 +68,11 @@ func (c *FolderController) GetAllFolders(ctx *fiber.Ctx) error {
 		})
 	}
 
+	// Ensure we never return nil, always return empty array
+	if folders == nil {
+		folders = []*models.Folder{}
+	}
+
 	return ctx.JSON(models.ApiResponse[[]*models.Folder]{
 		Success: true,
 		Data:    folders,
@@ -212,6 +217,11 @@ func (c *FolderController) GetFoldersByParent(ctx *fiber.Ctx) error {
 			Success: false,
 			Message: err.Error(),
 		})
+	}
+
+	// Ensure we never return nil, always return empty array
+	if folders == nil {
+		folders = []*models.Folder{}
 	}
 
 	return ctx.JSON(models.ApiResponse[[]*models.Folder]{

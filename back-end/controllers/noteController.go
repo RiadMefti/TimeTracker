@@ -68,6 +68,11 @@ func (c *NoteController) GetAllNotes(ctx *fiber.Ctx) error {
 		})
 	}
 
+	// Ensure we never return nil, always return empty array
+	if notes == nil {
+		notes = []*models.Note{}
+	}
+
 	return ctx.JSON(models.ApiResponse[[]*models.Note]{
 		Success: true,
 		Data:    notes,
@@ -212,6 +217,11 @@ func (c *NoteController) GetNotesByFolder(ctx *fiber.Ctx) error {
 			Success: false,
 			Message: err.Error(),
 		})
+	}
+
+	// Ensure we never return nil, always return empty array
+	if notes == nil {
+		notes = []*models.Note{}
 	}
 
 	return ctx.JSON(models.ApiResponse[[]*models.Note]{

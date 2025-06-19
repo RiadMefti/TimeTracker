@@ -77,24 +77,12 @@ const DocumentViewer: FC<DocumentViewerProps> = ({ onBack, onDelete }) => {
     : [];
 
   const handleEdit = () => {
-    console.log('Edit button clicked. Current state:', {
-      isEditing,
-      currentNote: currentNote?.Title,
-      editContent: editContent.slice(0, 50),
-    });
-    
     // Refresh the edit content from current note to ensure it's up to date
     if (currentNote) {
       setEditTitle(currentNote.Title);
       setEditContent(currentNote.Content);
     }
     setIsEditing(true);
-    
-    console.log('After setting edit mode:', {
-      isEditing: true,
-      editTitle,
-      editContent: editContent.slice(0, 50),
-    });
   };
 
   const handleSave = async () => {
